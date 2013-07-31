@@ -1,0 +1,5 @@
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M120/nuTuple_10_2_tsf.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M120/nuTuple_11_2_Arf.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M120/nuTuple_1_2_ELA.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M120/nuTuple_2_2_DDd.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M120/nuTuple_3_2_aCE.root

@@ -1,0 +1,76 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.6	//
+AngCut	higgsAnalyzer_TemplateV2.C	/^float   AngCut         = 999;$/;"	v
+BDT	higgsAnalyzer_TemplateV2.C	/^    MLPBNN, BDTG, BDT$/;"	e	enum:DISCR_METHOD	file:
+BDTG	higgsAnalyzer_TemplateV2.C	/^    MLPBNN, BDTG, BDT$/;"	e	enum:DISCR_METHOD	file:
+Begin	higgsAnalyzer_TemplateV2.C	/^void higgsAnalyzer::Begin(TTree * \/*tree*\/) $/;"	f	class:higgsAnalyzer
+CalculateM12sqrd	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::CalculateM12sqrd(TLorentzVector p1, TLorentzVector p2)$/;"	f	class:higgsAnalyzer
+CalculateTransMass	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::CalculateTransMass(TLorentzVector p1, TLorentzVector p2)$/;"	f	class:higgsAnalyzer
+CalculateTransMassAlt	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::CalculateTransMassAlt(TLorentzVector p1, TLorentzVector p2)$/;"	f	class:higgsAnalyzer
+CalculateX1	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::CalculateX1(TLorentzVector p1,TLorentzVector p2)$/;"	f	class:higgsAnalyzer
+CalculateX2	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::CalculateX2(TLorentzVector p1, TLorentzVector p2)$/;"	f	class:higgsAnalyzer
+CosmicMuonFilter	higgsAnalyzer_TemplateV2.C	/^bool higgsAnalyzer::CosmicMuonFilter(TCMuon muon1, TCMuon muon2)$/;"	f	class:higgsAnalyzer
+DISCR_METHOD	higgsAnalyzer_TemplateV2.C	/^enum DISCR_METHOD {$/;"	g	file:
+DISCR_TYPE	higgsAnalyzer_TemplateV2.C	/^enum DISCR_TYPE {$/;"	g	file:
+DYGammaVeto	higgsAnalyzer_TemplateV2.C	/^bool    DYGammaVeto    = true;$/;"	v
+D_ZJets	higgsAnalyzer_TemplateV2.C	/^    D_ZJets$/;"	e	enum:DISCR_TYPE	file:
+DeltaPhiJetMET	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::DeltaPhiJetMET(TLorentzVector metP4, vector<TLorentzVector> jets, float evtWeight)$/;"	f	class:higgsAnalyzer
+DileptonBasicPlots	higgsAnalyzer_TemplateV2.C	/^void higgsAnalyzer::DileptonBasicPlots(TLorentzVector ZP4, float evtWeight)$/;"	f	class:higgsAnalyzer
+Dxy	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::Dxy(TVector3 objVtx, TLorentzVector objP4, TVector3 vtx)$/;"	f	class:higgsAnalyzer
+Dz	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::Dz(TVector3 objVtx, TLorentzVector objP4, TVector3 vtx)$/;"	f	class:higgsAnalyzer
+ElectronSortCondition	higgsAnalyzer_TemplateV2.C	/^bool ElectronSortCondition(const TCElectron& e1, const TCElectron& e2) {return (e1.Pt() > e2.Pt());}$/;"	f
+GenPlots	higgsAnalyzer_TemplateV2.C	/^void higgsAnalyzer::GenPlots(vector<TCGenParticle> Zs, vector<TCGenParticle> leps, vector<TCGenParticle> phots, vector<TCGenParticle> Hs, TLorentzVector ZP4, TLorentzVector GP4, float evtWeight)$/;"	f	class:higgsAnalyzer
+GenSortCondition	higgsAnalyzer_TemplateV2.C	/^bool GenSortCondition(const TCGenParticle& ge1, const TCGenParticle& ge2) {return (ge1.Pt() > ge2.Pt());}$/;"	f
+GetPhotonMass	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::GetPhotonMass()$/;"	f	class:higgsAnalyzer
+GetReducedMET	higgsAnalyzer_TemplateV2.C	/^TLorentzVector higgsAnalyzer::GetReducedMET(TLorentzVector sumJet, TLorentzVector lep1, TLorentzVector lep2, TLorentzVector metP4, int version) $/;"	f	class:higgsAnalyzer
+JC_LVL	higgsAnalyzer_TemplateV2.C	/^int     JC_LVL         = 0;$/;"	v
+JetSortCondition	higgsAnalyzer_TemplateV2.C	/^bool JetSortCondition(const TCJet& j1, const TCJet& j2) {return (j1.Pt() > j2.Pt());}$/;"	f
+LeptonBasicPlots	higgsAnalyzer_TemplateV2.C	/^void higgsAnalyzer::LeptonBasicPlots(TLorentzVector p1, TLorentzVector p2, float evtWeight)$/;"	f	class:higgsAnalyzer
+MLPBNN	higgsAnalyzer_TemplateV2.C	/^    MLPBNN, BDTG, BDT$/;"	e	enum:DISCR_METHOD	file:
+MassZG	higgsAnalyzer_TemplateV2.C	/^float   MassZG[]       = {110., 180.} ;    $/;"	v
+MetPlusLeptonPlots	higgsAnalyzer_TemplateV2.C	/^void higgsAnalyzer::MetPlusLeptonPlots(TLorentzVector metP4, TLorentzVector p1, TLorentzVector p2, float evtWeight)$/;"	f	class:higgsAnalyzer
+MetPlusZPlots	higgsAnalyzer_TemplateV2.C	/^void higgsAnalyzer::MetPlusZPlots(TLorentzVector metP4, TLorentzVector ZP4, float evtWeight)$/;"	f	class:higgsAnalyzer
+MuonSortCondition	higgsAnalyzer_TemplateV2.C	/^bool MuonSortCondition(const TCMuon& m1, const TCMuon& m2) {return (m1.Pt() > m2.Pt());}$/;"	f
+N_DISCR_METHODS	higgsAnalyzer_TemplateV2.C	79;"	d	file:
+N_HIGGS_MASSES	higgsAnalyzer_TemplateV2.C	94;"	d	file:
+P4SortCondition	higgsAnalyzer_TemplateV2.C	/^bool P4SortCondition(const TLorentzVector& p1, const TLorentzVector& p2) {return (p1.Pt() > p2.Pt());} $/;"	f
+PUCorrectedMET	higgsAnalyzer_TemplateV2.C	/^float higgsAnalyzer::PUCorrectedMET(float met, int nPV, string metType)$/;"	f	class:higgsAnalyzer
+PhotonSortCondition	higgsAnalyzer_TemplateV2.C	/^bool PhotonSortCondition(const TCPhoton& g1, const TCPhoton& g2) {return (g1.Pt() > g2.Pt());}$/;"	f
+Process	higgsAnalyzer_TemplateV2.C	/^bool higgsAnalyzer::Process(Long64_t entry)$/;"	f	class:higgsAnalyzer
+PtDiffZG	higgsAnalyzer_TemplateV2.C	/^float   PtDiffZG[]     = {-999, 999.};$/;"	v
+StandardPlots	higgsAnalyzer_TemplateV2.C	/^void higgsAnalyzer::StandardPlots(TLorentzVector p1, TLorentzVector p2, TLorentzVector zbos, TLorentzVector gamma, float evtWeight,string tag, string folder)$/;"	f	class:higgsAnalyzer
+SumEt	higgsAnalyzer_TemplateV2.C	/^float   SumEt          = 99999.;$/;"	v
+Terminate	higgsAnalyzer_TemplateV2.C	/^void higgsAnalyzer::Terminate()$/;"	f	class:higgsAnalyzer
+USE_MVA	higgsAnalyzer_TemplateV2.C	68;"	d	file:
+_GPt	higgsAnalyzer_TemplateV2.C	/^Float_t _diffZGvector, _threeBodyPt, _GPt, _cosZ, _diffPlaneMVA, _vtxVariable;$/;"	v
+_cosZ	higgsAnalyzer_TemplateV2.C	/^Float_t _diffZGvector, _threeBodyPt, _GPt, _cosZ, _diffPlaneMVA, _vtxVariable;$/;"	v
+_diffPlaneMVA	higgsAnalyzer_TemplateV2.C	/^Float_t _diffZGvector, _threeBodyPt, _GPt, _cosZ, _diffPlaneMVA, _vtxVariable;$/;"	v
+_diffZGvector	higgsAnalyzer_TemplateV2.C	/^Float_t _diffZGvector, _threeBodyPt, _GPt, _cosZ, _diffPlaneMVA, _vtxVariable;$/;"	v
+_threeBodyPt	higgsAnalyzer_TemplateV2.C	/^Float_t _diffZGvector, _threeBodyPt, _GPt, _cosZ, _diffPlaneMVA, _vtxVariable;$/;"	v
+_vtxVariable	higgsAnalyzer_TemplateV2.C	/^Float_t _diffZGvector, _threeBodyPt, _GPt, _cosZ, _diffPlaneMVA, _vtxVariable;$/;"	v
+bJetVeto	higgsAnalyzer_TemplateV2.C	/^float   bJetVeto       = 9999.;$/;"	v
+bdtCut	higgsAnalyzer_TemplateV2.C	/^ Float_t bdtCut[N_HIGGS_MASSES] = {0.8};$/;"	v
+customPhotoID	higgsAnalyzer_TemplateV2.C	/^bool    customPhotoID  = false;$/;"	v
+discrMethodName	higgsAnalyzer_TemplateV2.C	/^TString discrMethodName[3] = {$/;"	v
+discrSampleName	higgsAnalyzer_TemplateV2.C	/^TString discrSampleName = "MVA_ZJets";$/;"	v
+elePtCut	higgsAnalyzer_TemplateV2.C	/^float   elePtCut[]     = {20., 999999.};$/;"	v
+gammaECut	higgsAnalyzer_TemplateV2.C	/^float   gammaECut[]    = {0.,999.};$/;"	v
+gammaPtCut	higgsAnalyzer_TemplateV2.C	/^float   gammaPtCut[]   = {15., 9999.};$/;"	v
+higgsAnalyzer_cxx	higgsAnalyzer_TemplateV2.C	1;"	d	file:
+jetPtCut	higgsAnalyzer_TemplateV2.C	/^float   jetPtCut[]     = {15};$/;"	v
+metByQtCut	higgsAnalyzer_TemplateV2.C	/^float   metByQtCut[]   = {-999.,999};  \/\/2L2Nu$/;"	v
+metCut	higgsAnalyzer_TemplateV2.C	/^float   metCut[]       = {-9999., 9999.}; \/\/2L2Nu$/;"	v
+muPtCut	higgsAnalyzer_TemplateV2.C	/^float   muPtCut[]      = {20., 999999.};$/;"	v
+mvaHiggsMassPoint	higgsAnalyzer_TemplateV2.C	/^Int_t mvaHiggsMassPoint[N_HIGGS_MASSES] = {125};$/;"	v
+nJets	higgsAnalyzer_TemplateV2.C	/^int     nJets[]        = {0, 999};  \/\/2L2Nu$/;"	v
+period	higgsAnalyzer_TemplateV2.C	/^string  period         = "PERIOD";$/;"	v
+qtCut	higgsAnalyzer_TemplateV2.C	/^float   qtCut          = 0.;$/;"	v
+suffix	higgsAnalyzer_TemplateV2.C	/^string  suffix         = "SUFFIX";$/;"	v
+tmvaReader	higgsAnalyzer_TemplateV2.C	/^TMVA::Reader* tmvaReader;$/;"	v
+trigger	higgsAnalyzer_TemplateV2.C	/^int     trigger[]      = {TRIGGER};$/;"	v
+weightsDir	higgsAnalyzer_TemplateV2.C	/^TString weightsDir = "\/uscms_data\/d2\/bpollack\/CMSSW_4_4_2\/src\/MVACodes\/mvaExamples_brian\/weights\/";$/;"	v
+zMassCut	higgsAnalyzer_TemplateV2.C	/^float   zMassCut[]     = {76.2, 106.2};$/;"	v

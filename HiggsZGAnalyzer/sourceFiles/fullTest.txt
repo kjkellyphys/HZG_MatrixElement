@@ -1,0 +1,11 @@
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_10_1_jli.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_11_1_ndZ.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_1_1_9eL.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_2_1_5MC.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_3_1_YaC.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_4_1_M4I.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_5_1_Cgi.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_6_1_U8i.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_7_1_Dk4.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_8_1_1w9.root
+/uscms/home/bpollack/EOS/V02_00_8TeV/ggHZG_M125_TEST_8TeV/nuTuple_9_1_snj.root

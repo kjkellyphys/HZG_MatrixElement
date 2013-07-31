@@ -1,0 +1,11 @@
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_10_2_xWc.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_11_2_00u.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_1_1_xWM.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_2_1_uch.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_3_3_bP6.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_4_3_y6a.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_5_2_DgG.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_6_2_GIA.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_7_2_JrG.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_8_2_bYr.root
+/eos/uscms/store/user/bpollack/V02_01_8TeV/ggHZG_M125/nuTuple_9_2_C2N.root
