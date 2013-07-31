@@ -1,1 +1,4 @@
-adding more stuff
+The Full Higgs -> ZG analyzer for NWU group, by Brian Pollack.
+This analyzer is built to run on NWU ntuples only.
+Scripts folder contains useful functions, not all directly related to HZG.
+
