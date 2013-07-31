@@ -47,10 +47,10 @@ Thumbs.db
 
 # Specific Folders #
 ####################
-ForLeti/*
-ForStoyan/*
-ForKristian/*
-BatchHistos/*
-outputBatch/*
-LocalHistos/*
-pollack
+HiggsZGAnalyzer/ForLeti/*
+HiggsZGAnalyzer/ForStoyan/*
+HiggsZGAnalyzer/ForKristian/*
+HiggsZGAnalyzer/BatchHistos/*
+HiggsZGAnalyzer/outputBatch/*
+HiggsZGAnalyzer/LocalHistos/*
+HiggsZGAnalyzer/pollack
