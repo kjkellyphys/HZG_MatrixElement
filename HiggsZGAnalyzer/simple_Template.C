@@ -223,6 +223,7 @@ void  simple_v2::FindGenParticles(TClonesArray *genParticles, string selection, 
   vector<TCGenParticle> genLeptons;
   bool isMuMuGamma = false;
   bool isEEGamma = false;
+  bool goodPhot = false;
 
   for (int i = 0; i < genParticles->GetSize(); ++i) {
     TCGenParticle* thisGen = (TCGenParticle*) genParticles->At(i);    
@@ -275,11 +276,12 @@ void  simple_v2::FindGenParticles(TClonesArray *genParticles, string selection, 
     }
   }else { return;}
 
-  if (genPhotons.size() > 0){
+  if (genPhotons.size() > 0 && posLep && negLep){
       for (testIt=genPhotons.begin(); testIt<genPhotons.end(); testIt++){
         //cout<<"mother: "<<testIt->Mother()<<"\tstatus: "<<testIt->GetStatus()<<endl;
-        if (testIt->Mother() == 25 && fabs((*testIt+*_genHZG.lm+*_genHZG.lp).M()-125.0) < 2.0) _genHZG.g = new TCGenParticle(*testIt); break;
+        if (testIt->Mother() == 25 && fabs((*testIt+*_genHZG.lm+*_genHZG.lp).M()-125.0) < 0.1) _genHZG.g = new TCGenParticle(*testIt); goodPhot = true; break;
       }
+      if (!goodPhot) return;
     //_genHZG.g = new TCGenParticle(genPhotons.front());
   }else{ return;}
 
