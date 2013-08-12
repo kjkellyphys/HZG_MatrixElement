@@ -391,125 +391,6 @@ Bool_t higgsAnalyzerV2::Process(Long64_t entry)
   m_llg = m_llgCAT1 = m_llgCAT2 = m_llgCAT3 = m_llgCAT4 = -1;
   unBinnedWeight = unBinnedLumiXS = 1;
 
-  ///////////////////////////
-  // Electron Preselection //
-  ///////////////////////////
-
-  /*
-  if (selection == "eeGamma"){
-    if (recoElectrons->GetSize() < 2) return kTRUE;  
-
-    bool leadingEl = false;
-    int leadingPos = -1;
-    for (int i = 0; i <  recoElectrons->GetSize(); ++i) {
-      TCElectron* thisElec = (TCElectron*) recoElectrons->At(i);    
-      if (thisElec->Pt() > 20){
-        leadingEl = true;
-        leadingPos = i;
-        break;
-      }
-    }
-    if (!leadingEl) return kTRUE;
-
-    bool trailingEl = false;
-    for (int i = 0; i <  recoElectrons->GetSize(); ++i) {
-      TCElectron* thisElec = (TCElectron*) recoElectrons->At(i);    
-      if ((i != leadingPos) && (thisElec->Pt() > 10)){
-        trailingEl = true;
-        break;
-      }
-    }
-    if (!trailingEl) return kTRUE;
-  }
-*/
-
-  hm->fill1DHist(2,"h1_acceptanceByCut_SUFFIX", "Weighted number of events passing cuts by cut; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
-  hm->fill1DHist(2,"h1_acceptanceByCutRaw_SUFFIX", "Raw number of events passing cuts; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
-  if (!isRealData) hm->fill1DHist(nPUVerticesTrue,"h1_simVertexMultTrueUltraFine_SUFFIX", "Multiplicity of simulated vertices true", 500, 0, 100,1,"Misc");
-  ++nEvents[1];
-
-
-
-  //////////////////
-  //Trigger status//
-  //////////////////
-
-  for(int i = 0; i < 64; ++i) {
-    unsigned long iHLT = 0x0; 
-    iHLT = 0x01 << i;  
-    if ((triggerStatus & iHLT) == iHLT) hm->fill1DHist(i+1,"h1_triggerStatus_SUFFIX", "Triggers", 64, 0.5, 64.5,1,"Misc");  
-  } 
-
-  bool triggerPass   = triggerSelector->SelectTrigger(triggerStatus, hltPrescale);
-  //cout<<"triggerStatus: "<<triggerStatus<<" hltPrescale: "<<hltPrescale<<" triggerPass: "<<triggerPass<<endl;
-  //int  eventPrescale = triggerSelector->GetEventPrescale();
-  //cout<<eventPrescale<<endl;
-
-  /*
-  cout<<"new trig event"<<endl;
-  for (int i = 0; i <  triggerObjects->GetSize(); ++i) {
-    TCTriggerObject* thisTrigObj = (TCTriggerObject*) triggerObjects->At(i);    
-    cout<<" HLT: "<<thisTrigObj->GetHLTName()<<endl;
-    cout<<" module: "<<thisTrigObj->GetModuleName()<<endl;
-    cout<<" id: "<<thisTrigObj->GetId()<<endl;
-    thisTrigObj->Print();
-    cout<<endl;
-  }
-  */
-  //if (!triggerPass) return kTRUE;
-  hm->fill1DHist(3,"h1_acceptanceByCut_SUFFIX", "Weighted number of events passing cuts by cut; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
-  hm->fill1DHist(3,"h1_acceptanceByCutRaw_SUFFIX", "Raw number of events passing cuts; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
-  ++nEvents[2];
-
-
-
-
-  ////////////////////////////
-  //Check the event vertices//
-  ////////////////////////////
-
-
-  if (!isRealData) hm->fill1DHist(nPUVertices,"h1_simVertexMultStoyan_SUFFIX", "Multiplicity of simulated vertices", 60, 0, 60, 1, "Misc");
-  if (!isRealData) hm->fill1DHist(nPUVertices,"h1_simVertexMultPoter_SUFFIX", "Multiplicity of simulated vertices", 100, 0, 100, 1, "Misc");
-  if (!isRealData) hm->fill1DHist(nPUVertices,"h1_simVertexMult_SUFFIX", "Multiplicity of simulated vertices", 50, -0.5, 49.5,1,"Misc");
-  if (!isRealData) hm->fill1DHist(nPUVerticesTrue,"h1_simVertexMultTrue_SUFFIX", "Multiplicity of simulated vertices true", 50, -0.5, 49.5,1,"Misc");
-  if (!isRealData) hm->fill1DHist(nPUVerticesTrue,"h1_simVertexMultTrueFine_SUFFIX", "Multiplicity of simulated vertices true", 200, 0, 100,1,"Misc");
-
-
-  vector<TVector3> goodVertices;
-  vector<TCPrimaryVtx> pvVect;
-  for (int i = 0; i < primaryVtx->GetSize(); ++i) {
-    TCPrimaryVtx* pVtx = (TCPrimaryVtx*) primaryVtx->At(i);
-    if (
-        !pVtx->IsFake() 
-        && pVtx->NDof() > 4.
-        && fabs(pVtx->z()) <= 24.
-        && fabs(pVtx->Perp()) <= 2.
-       )
-
-      goodVertices.push_back(*pVtx);
-
-  }
-  //if (goodVertices.size() < 1) return kTRUE;
-  hm->fill1DHist(4,"h1_acceptanceByCut_SUFFIX", "Weighted number of events passing cuts by cut; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
-  hm->fill1DHist(4,"h1_acceptanceByCutRaw_SUFFIX", "Raw number of events passing cuts; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
-  ++nEvents[3];
-
-  pvPosition = new TVector3();
-  *pvPosition = goodVertices[0];
-
-
-
-  //////////////////
-  // Data quality //
-  //////////////////
-
-  //if (isRealData && (isDeadEcalCluster || isScraping || isCSCTightHalo)) return kTRUE;
-  //if (isRealData && (isNoiseHcal || isDeadEcalCluster || isScraping || isCSCTightHalo)) return kTRUE;
-  hm->fill1DHist(5,"h1_acceptanceByCut_SUFFIX", "Weighted number of events passing cuts by cut; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
-  hm->fill1DHist(5,"h1_acceptanceByCutRaw_SUFFIX", "Raw number of events passing cuts; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
-  ++nEvents[4];
-
   ///////////////////
   // Gen Particles //
   ///////////////////
@@ -649,6 +530,126 @@ Bool_t higgsAnalyzerV2::Process(Long64_t entry)
       }
     }
   }
+
+  ///////////////////////////
+  // Electron Preselection //
+  ///////////////////////////
+
+  /*
+  if (selection == "eeGamma"){
+    if (recoElectrons->GetSize() < 2) return kTRUE;  
+
+    bool leadingEl = false;
+    int leadingPos = -1;
+    for (int i = 0; i <  recoElectrons->GetSize(); ++i) {
+      TCElectron* thisElec = (TCElectron*) recoElectrons->At(i);    
+      if (thisElec->Pt() > 20){
+        leadingEl = true;
+        leadingPos = i;
+        break;
+      }
+    }
+    if (!leadingEl) return kTRUE;
+
+    bool trailingEl = false;
+    for (int i = 0; i <  recoElectrons->GetSize(); ++i) {
+      TCElectron* thisElec = (TCElectron*) recoElectrons->At(i);    
+      if ((i != leadingPos) && (thisElec->Pt() > 10)){
+        trailingEl = true;
+        break;
+      }
+    }
+    if (!trailingEl) return kTRUE;
+  }
+*/
+
+  hm->fill1DHist(2,"h1_acceptanceByCut_SUFFIX", "Weighted number of events passing cuts by cut; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
+  hm->fill1DHist(2,"h1_acceptanceByCutRaw_SUFFIX", "Raw number of events passing cuts; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
+  if (!isRealData) hm->fill1DHist(nPUVerticesTrue,"h1_simVertexMultTrueUltraFine_SUFFIX", "Multiplicity of simulated vertices true", 500, 0, 100,1,"Misc");
+  ++nEvents[1];
+
+
+
+  //////////////////
+  //Trigger status//
+  //////////////////
+
+  for(int i = 0; i < 64; ++i) {
+    unsigned long iHLT = 0x0; 
+    iHLT = 0x01 << i;  
+    if ((triggerStatus & iHLT) == iHLT) hm->fill1DHist(i+1,"h1_triggerStatus_SUFFIX", "Triggers", 64, 0.5, 64.5,1,"Misc");  
+  } 
+
+  bool triggerPass   = triggerSelector->SelectTrigger(triggerStatus, hltPrescale);
+  //cout<<"triggerStatus: "<<triggerStatus<<" hltPrescale: "<<hltPrescale<<" triggerPass: "<<triggerPass<<endl;
+  //int  eventPrescale = triggerSelector->GetEventPrescale();
+  //cout<<eventPrescale<<endl;
+
+  /*
+  cout<<"new trig event"<<endl;
+  for (int i = 0; i <  triggerObjects->GetSize(); ++i) {
+    TCTriggerObject* thisTrigObj = (TCTriggerObject*) triggerObjects->At(i);    
+    cout<<" HLT: "<<thisTrigObj->GetHLTName()<<endl;
+    cout<<" module: "<<thisTrigObj->GetModuleName()<<endl;
+    cout<<" id: "<<thisTrigObj->GetId()<<endl;
+    thisTrigObj->Print();
+    cout<<endl;
+  }
+  */
+  if (!triggerPass) return kTRUE;
+  hm->fill1DHist(3,"h1_acceptanceByCut_SUFFIX", "Weighted number of events passing cuts by cut; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
+  hm->fill1DHist(3,"h1_acceptanceByCutRaw_SUFFIX", "Raw number of events passing cuts; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
+  ++nEvents[2];
+
+
+
+
+  ////////////////////////////
+  //Check the event vertices//
+  ////////////////////////////
+
+
+  if (!isRealData) hm->fill1DHist(nPUVertices,"h1_simVertexMultStoyan_SUFFIX", "Multiplicity of simulated vertices", 60, 0, 60, 1, "Misc");
+  if (!isRealData) hm->fill1DHist(nPUVertices,"h1_simVertexMultPoter_SUFFIX", "Multiplicity of simulated vertices", 100, 0, 100, 1, "Misc");
+  if (!isRealData) hm->fill1DHist(nPUVertices,"h1_simVertexMult_SUFFIX", "Multiplicity of simulated vertices", 50, -0.5, 49.5,1,"Misc");
+  if (!isRealData) hm->fill1DHist(nPUVerticesTrue,"h1_simVertexMultTrue_SUFFIX", "Multiplicity of simulated vertices true", 50, -0.5, 49.5,1,"Misc");
+  if (!isRealData) hm->fill1DHist(nPUVerticesTrue,"h1_simVertexMultTrueFine_SUFFIX", "Multiplicity of simulated vertices true", 200, 0, 100,1,"Misc");
+
+
+  vector<TVector3> goodVertices;
+  vector<TCPrimaryVtx> pvVect;
+  for (int i = 0; i < primaryVtx->GetSize(); ++i) {
+    TCPrimaryVtx* pVtx = (TCPrimaryVtx*) primaryVtx->At(i);
+    if (
+        !pVtx->IsFake() 
+        && pVtx->NDof() > 4.
+        && fabs(pVtx->z()) <= 24.
+        && fabs(pVtx->Perp()) <= 2.
+       )
+
+      goodVertices.push_back(*pVtx);
+
+  }
+  if (goodVertices.size() < 1) return kTRUE;
+  hm->fill1DHist(4,"h1_acceptanceByCut_SUFFIX", "Weighted number of events passing cuts by cut; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
+  hm->fill1DHist(4,"h1_acceptanceByCutRaw_SUFFIX", "Raw number of events passing cuts; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
+  ++nEvents[3];
+
+  pvPosition = new TVector3();
+  *pvPosition = goodVertices[0];
+
+
+
+  //////////////////
+  // Data quality //
+  //////////////////
+
+  //if (isRealData && (isDeadEcalCluster || isScraping || isCSCTightHalo)) return kTRUE;
+  //if (isRealData && (isNoiseHcal || isDeadEcalCluster || isScraping || isCSCTightHalo)) return kTRUE;
+  hm->fill1DHist(5,"h1_acceptanceByCut_SUFFIX", "Weighted number of events passing cuts by cut; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
+  hm->fill1DHist(5,"h1_acceptanceByCutRaw_SUFFIX", "Raw number of events passing cuts; cut; N_{evts}", 100, 0.5, 100.5,1,"Misc");
+  ++nEvents[4];
+
 
 
 
@@ -2093,6 +2094,7 @@ void higgsAnalyzerV2::AnglePlots(ZGAngles &zga,float eventWeight)
   hm->fill1DHist(zga.costheta_lm,"h1_costhetaLM_SUFFIX", "Cos(#theta) negative lepton;cos(#theta);N_{evts}", 50, -1., 1., eventWeight,"ZGAngles");     
   hm->fill1DHist(zga.phi,"h1_phi_SUFFIX", "#phi positive lepton;#phi;N_{evts}", 50, -TMath::Pi(), TMath::Pi(), eventWeight,"ZGAngles");     
   hm->fill1DHist(zga.cosTheta,"h1_costhetaZG_SUFFIX", "Cos(#Theta) ZG system;cos(#Theta);N_{evts}", 50, -1., 1., eventWeight,"ZGAngles");     
+  hm->fill1DHist(zga.costheta_lm+zga.costheta_lp,"h1_costhetaBoth_SUFFIX", "Cos(#theta) of both lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1, eventWeight,"ZGAngles");     
 }
 
 void higgsAnalyzerV2::DileptonBasicPlots(TLorentzVector ZP4, float eventWeight)
@@ -3016,7 +3018,8 @@ void higgsAnalyzerV2::LumiXSWeight(float * LumiXSWeight){
 
       if(suffix.find("gg") != string::npos){
         if(suffix.find("120")!=string::npos) *LumiXSWeight = 99992/(21.13*0.00111*0.10098*1000);
-        if(suffix.find("125")!=string::npos) *LumiXSWeight = 99991/(19.52*0.00154*0.100974*1000);
+        //if(suffix.find("125")!=string::npos) *LumiXSWeight = 99991/(19.52*0.00154*0.100974*1000);
+        if(suffix.find("125")!=string::npos) *LumiXSWeight = 100000/(19.52*0.00154*0.100974*1000);
         if(suffix.find("130")!=string::npos) *LumiXSWeight = 99991/(18.07*0.00195*0.10098*1000);
         if(suffix.find("135")!=string::npos) *LumiXSWeight = 99996/(16.79*0.00227*0.10098*1000);
         if(suffix.find("140")!=string::npos) *LumiXSWeight = 96994/(15.63*0.00246*0.10098*1000);

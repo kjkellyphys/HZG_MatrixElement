@@ -8,8 +8,8 @@ gROOT.ProcessLine('.L ./tdrstyle.C')
 setTDRStyle()
 
 def ComparisonSuite():
-  File1= TFile("/uscms/home/bpollack/work/CMSSW_5_3_6/src/PollackPrograms/HiggsZGAnalyzer/localHistos/higgsHistograms_ggM125_8TeV_local.root")
-  File2= TFile("/uscms/home/bpollack/work/CMSSW_5_3_6/src/PollackPrograms/HiggsZGAnalyzer/localHistos/higgsHistograms_ggM125_8TeV_pythia8_local.root")
+  File1= TFile("/uscms_data/d2/bpollack/CMSSW_5_3_8_patch1/src/HZG_Analyzer/HiggsZGAnalyzer/localHistos/higgsHistograms_ggM125_8TeV_local.root")
+  File2= TFile("/uscms_data/d2/bpollack/CMSSW_5_3_8_patch1/src/HZG_Analyzer/HiggsZGAnalyzer/localHistos/higgsHistograms_ggM125_8TeV_pythia8_175_local.root")
 
   #selection = ['el','mu']
   plotList = []
@@ -20,7 +20,7 @@ def ComparisonSuite():
   catList = ['CAT1','CAT2','CAT3','CAT4','','PostGen','ZGAngles']
   distList = ['Pt','Eta','Phi','Mass']
   physList1 = ['Photon','LeadingLepton','TrailingLepton','DiLep','ThreeBody']
-  physList2 = ['costhetaLP','costhetaLM','phi','costhetaZG']
+  physList2 = ['costhetaBoth','phi','costhetaZG']
   can= TCanvas('trailingCan','canvas',800,600)
   can.cd()
   can.SetGrid(2,2)
@@ -39,7 +39,7 @@ def ComparisonSuite():
         for dist in distListTmp:
           for i,thisFile in enumerate(fileList):
             if i == 0: suffix = ''
-            elif i ==1: suffix = '_pythia8'
+            elif i ==1: suffix = ''
             if sel == 'mu':
               if phys == 'Photon':
                 thisPlot = thisFile.GetDirectory(folder).Get('h1_photon'+dist+cat+'_Signal2012ggM125'+suffix)
@@ -52,7 +52,12 @@ def ComparisonSuite():
               if phys == 'ThreeBody':
                 thisPlot = thisFile.GetDirectory(folder).Get('h1_threeBody'+dist+cat+'_Signal2012ggM125'+suffix)
               elif phys not in physList1:
-                thisPlot = thisFile.GetDirectory(folder).Get('h1_'+phys+'_Signal2012ggM125'+suffix)
+                if phys is 'costhetaBoth':
+                  thisPlot = thisFile.GetDirectory(folder).Get('h1_costhetaLM_Signal2012ggM125'+suffix)
+                  thisPlot.Add(thisFile.GetDirectory(folder).Get('h1_costhetaLP_Signal2012ggM125'+suffix))
+                  thisPlot.SetTitle('Cos(#theta) of both leptons')
+                else:
+                  thisPlot = thisFile.GetDirectory(folder).Get('h1_'+phys+'_Signal2012ggM125'+suffix)
 
 
 
@@ -81,7 +86,7 @@ def ComparisonSuite():
             plotList.append(thisPlot)
 
           ymax = max(map(lambda x:x.GetMaximum(),plotList))*1.1
-          ymin = max(map(lambda x:x.GetMinimum(),plotList))*0.9
+          ymin = min(map(lambda x:x.GetMinimum(),plotList))*0.9
           for i,plot in enumerate(plotList):
             if i == 0:
               plot.SetMaximum(ymax)
