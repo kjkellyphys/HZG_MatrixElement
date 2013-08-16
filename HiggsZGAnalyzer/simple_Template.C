@@ -52,7 +52,7 @@ void simple_v2::Begin(TTree * /*tree*/)
   newfile = new TFile("simpleHistograms_SUFFIX_4Vec.root", "RECREATE");
   newfile->cd();
   ch = new TTree("K", "4Vectors of Events");
-    
+
   p_lminus = new TLorentzVector();
   p_lplus = new TLorentzVector();
   p_gamma = new TLorentzVector();
@@ -149,9 +149,10 @@ Bool_t simple_v2::Process(Long64_t entry)
       p_lplus->SetPxPyPzE(genHZG.lp->Px(), genHZG.lp->Py(), genHZG.lp->Pz(), genHZG.lp->Energy());
       p_gamma->SetPxPyPzE(genHZG.g->Px(), genHZG.g->Py(), genHZG.g->Pz(), genHZG.g->Energy());
       ch->Fill();
+
+      //cout<<"costheta_lm: "<<genLevelOutputs.costheta_lm<<"\tcostheta_lp: "<<genLevelOutputs.costheta_lp<<"\tphi: "<<genLevelOutputs.phi<<"\tcosTheta: "<<genLevelOutputs.cosTheta<<"\tcosThetaG: "<<genLevelOutputs.cosThetaG<<endl;
     }
   }
-
   return kTRUE;
 }
 
@@ -228,7 +229,10 @@ void simple_v2::AnglePlots(ZGAngles &zga,float eventWeight)
   hm->fill1DHist(zga.costheta_lm,"h1_costhetaLM_SUFFIX", "Cos(#theta) negative lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1, eventWeight);     
   hm->fill1DHist(zga.phi,"h1_phi_SUFFIX", "#phi positive lepton;#phi;N_{evts}", 50, -3.2, 3.2, eventWeight);     
   hm->fill1DHist(zga.cosTheta,"h1_costhetaZG_SUFFIX", "Cos(#Theta) ZG system;cos(#Theta);N_{evts}", 50, -1.1, 1.1, eventWeight);     
-  hm->fill1DHist(zga.costheta_lm+zga.costheta_lp,"h1_costhetaBoth_SUFFIX", "Cos(#theta) of both lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1, eventWeight);     
+  hm->fill1DHist(zga.ptg,"h1_ptgamma_SUFFIX", "Pt of photon in ZG System;Pt;N_{evts}",50,0,200,eventWeight);
+  hm->fill1DHist(zga.etal1,"h1_etaLP_SUFFIX", "Eta of positive lepton;#eta;N_{evts}",50,-5.0,5.0,eventWeight);
+  hm->fill1DHist(zga.etal2,"h1_etaLM_SUFFIX", "Eta of negative lepton;#eta;N_{evts}",50,-5.0,5.0,eventWeight);
+  hm->fill1DHist(zga.etag,"h1_etagamma_SUFFIX", "Eta of Gamma;#eta;N_{evts}",50,-5.0,5.0,eventWeight);
 }
 
 void  simple_v2::FindGenParticles(TClonesArray *genParticles, string selection, vector<TCGenParticle>& vetoPhotons, genHZGParticles& _genHZG){

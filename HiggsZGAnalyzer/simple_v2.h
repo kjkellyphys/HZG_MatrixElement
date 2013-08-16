@@ -34,11 +34,11 @@
 class simple_v2 : public TSelector {
   public :
     TFile* histoFile;
-    HistManager* hm;
     TFile* newfile;
     TTree* ch;
+    HistManager* hm;
     
-    float         unskimmedEvents;
+    float unskimmedEvents;
     float unskimmedEventsTotal;
     int fileCount;
     TTree *thisTree;

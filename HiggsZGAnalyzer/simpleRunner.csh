@@ -31,6 +31,7 @@ cat > run.C << +EOF
      gROOT->LoadMacro("plugins/HistManager.cc+");
      gROOT->LoadMacro("plugins/ZGAngles.cc+");
 
+
 	  TChain* fChain = new TChain("ntupleProducer/eventTree");
 
 	  ifstream sourceFiles("sourceFiles/$1.txt");
