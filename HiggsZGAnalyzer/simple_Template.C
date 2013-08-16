@@ -49,6 +49,17 @@ void simple_v2::Begin(TTree * /*tree*/)
 
   genHZG = {};
 
+  newfile = new TFile("simpleHistograms_SUFFIX_4Vec.root", "RECREATE");
+  newfile->cd();
+  ch = new TTree("K", "4Vectors of Events");
+    
+  p_lminus = new TLorentzVector();
+  p_lplus = new TLorentzVector();
+  p_gamma = new TLorentzVector();
+
+  ch->Branch("l_minus", "TLorentzVector", &p_lminus);
+  ch->Branch("l_plus", "TLorentzVector", &p_lplus);
+  ch->Branch("gamma", "TLorentzVector", &p_gamma);
 }
 
 void simple_v2::SlaveBegin(TTree * /*tree*/)
@@ -133,7 +144,11 @@ Bool_t simple_v2::Process(Long64_t entry)
       getZGAngles(genLevelInputs,genLevelOutputs, false);
       AnglePlots(genLevelOutputs,1);
       quickCount += 1;
-      //cout<<"costheta_lm: "<<genLevelOutputs.costheta_lm<<"\tcostheta_lp: "<<genLevelOutputs.costheta_lp<<"\tphi: "<<genLevelOutputs.phi<<"\tcosTheta: "<<genLevelOutputs.cosTheta<<"\tcosThetaG: "<<genLevelOutputs.cosThetaG<<endl;
+
+      p_lminus->SetPxPyPzE(genHZG.lm->Px(), genHZG.lm->Py(), genHZG.lm->Pz(), genHZG.lm->Energy());
+      p_lplus->SetPxPyPzE(genHZG.lp->Px(), genHZG.lp->Py(), genHZG.lp->Pz(), genHZG.lp->Energy());
+      p_gamma->SetPxPyPzE(genHZG.g->Px(), genHZG.g->Py(), genHZG.g->Pz(), genHZG.g->Energy());
+      ch->Fill();
     }
   }
 
@@ -158,6 +173,8 @@ void simple_v2::Terminate()
   cout<<"quickCount: "<<quickCount<<endl;
   histoFile->Write();
   histoFile->Close();  
+  newfile->Write();
+  newfile->Close();
 }
 
 bool simple_v2::PassMuonID(TCMuon *mu, muIDCuts cutLevel){

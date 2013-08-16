@@ -35,7 +35,9 @@ class simple_v2 : public TSelector {
   public :
     TFile* histoFile;
     HistManager* hm;
-
+    TFile* newfile;
+    TTree* ch;
+    
     float         unskimmedEvents;
     float unskimmedEventsTotal;
     int fileCount;
@@ -44,7 +46,7 @@ class simple_v2 : public TSelector {
     TH1F * h1_numOfEvents;
     TVector3 *pvPosition;
     float weight;
-
+    TLorentzVector *p_lminus, *p_lplus, *p_gamma;
 
     TTree          *fChain;   //!pointer to the analyzed TTree or TChain
 
