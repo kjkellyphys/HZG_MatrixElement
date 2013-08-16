@@ -29,10 +29,9 @@ void My_choose(TVar::Process process){
     //c-- 300 '  f(p1)+f(p2) --> Z^0(-->e^-(p3)+e^+(p4))+gamma(p5)'
     //c--     '  f(p1)+f(p2) --> Z^0 (no BR) +gamma(p5)' (removebr=.true.)
     nproc_.nproc=300;
-    //chooser_();
+    chooser_();
 
-    
-    npart_.npart=4;
+    npart_.npart=3;
     nqcdjets_.nqcdjets=0;
     bveg1_mcfm_.ndim=7;
     breit_.n2=0;
@@ -44,8 +43,7 @@ void My_choose(TVar::Process process){
     zcouple_.q1=-1.0;
     zcouple_.l1=zcouple_.le;
     zcouple_.r1=zcouple_.re;
-    
-    }
+  }
   /*
   //GG->Z+Gamma
   if (process==TVar::gg_zgam){
@@ -58,12 +56,11 @@ void My_choose(TVar::Process process){
     //c--  120 '  f(p1)+f(p2) --> H(-->Z^0(mu^-(p3)+mu^+(p4)) + gamma(p5)')'
     //c--      '  f(p1)+f(p2) -breit_.n2=0;
     nproc_.nproc=120;
-    //chooser_();
-    
+    chooser_();
     breit_.n3=1;
     breit_.mass3=masses_mcfm_.zmass;
     breit_.width3=masses_mcfm_.zwidth;
-    npart_.npart=4;
+    npart_.npart=3;
     nqcdjets_.nqcdjets=0;
     
     zcouple_.q1=-1.0;
@@ -74,8 +71,6 @@ void My_choose(TVar::Process process){
     breit_.n3=1;
     breit_.mass3=masses_mcfm_.zmass;
     breit_.width3=masses_mcfm_.zwidth;
-    
-    
   }
   /*
   //ZZ_4l
