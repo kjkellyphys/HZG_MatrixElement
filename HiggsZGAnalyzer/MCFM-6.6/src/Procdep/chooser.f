@@ -71,7 +71,7 @@ c---- total cross-section comes out correctly when the BR is removed
       open(unit=21,file=string,status='old',err=43)
       call checkversion(21,string)
       
-      write(6,*) 'Chooser:process chosen by nproc=',nproc
+c      write(6,*) 'Chooser:process chosen by nproc=',nproc
 
       do j=1,600
       read(21,*,err=44) mproc,pname,order
@@ -85,13 +85,14 @@ c---- total cross-section comes out correctly when the BR is removed
       enddo
       goto 44
 
- 42   write(6,*)
-      write(6,*) '*************************** f(p1)+f(p2) --> *****'//
-     . '*************************************'
-      write(6,*) '* ',pname(19:100),' *'
-      write(6,*) '*************************************************'//
-     . '*************************************'
-      write(6,*)
+ 42
+c   write(6,*)
+c      write(6,*) '*************************** f(p1)+f(p2) --> *****'//
+c     . '*************************************'
+c      write(6,*) '* ',pname(19:100),' *'
+c      write(6,*) '*************************************************'//
+c     . '*************************************'
+c      write(6,*)
 
       close(unit=21)
 

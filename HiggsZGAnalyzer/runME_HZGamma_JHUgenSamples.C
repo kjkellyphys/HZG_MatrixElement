@@ -5,6 +5,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TLeaf.h"
+#include "TObject.h"
 #include "TProfile.h"
 #include <iostream>
 #include "Math/LorentzVector.h"
@@ -25,71 +26,6 @@ float ERRORthreshold=1.0;
 using namespace std;
 
 void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt, TVar::VerbosityLevel verbosity);
-
-vector<TLorentzVector> Calculate4Momentum(float Mx,float M1,float M2,float theta,float theta1,float theta2,float Phi1,float Phi)
-{
-    float phi1,phi2;
-    phi1=TMath::Pi()-Phi1;
-    phi2=Phi1+Phi;
-    
-    
-    float gamma1,gamma2,beta1,beta2;
-    
-    gamma1=(Mx*Mx+M1*M1-M2*M2)/(2*Mx*M1);
-    gamma2=(Mx*Mx-M1*M1+M2*M2)/(2*Mx*M2);
-    beta1=sqrt(1-1/(gamma1*gamma1));
-    beta2=sqrt(1-1/(gamma2*gamma2));
-    
-    
-    //incoming particle 4 vectors
-    TLorentzVector p1CM(0,0,Mx/2,Mx/2);
-    TLorentzVector p2CM(0,0,-Mx/2,Mx/2);
-    
-    //vector boson 4 vectors
-    TLorentzVector kZ(gamma1*M1*sin(theta)*beta1,0, gamma1*M1*cos(theta)*beta1,gamma1*M1*1);   
-    TLorentzVector kG(-gamma2*M2*sin(theta)*beta2,0, -gamma2*M2*cos(theta)*beta2,gamma2*M2*1);
-    
-    //Rotation and Boost matrices. Note gamma1*beta1*M1=gamma2*beta2*M2.
-    
-    TLorentzRotation Z1ToZ,Z2ToZ;
-    
-    Z1ToZ.Boost(0,0,beta1);
-    Z2ToZ.Boost(0,0,beta2);
-    Z1ToZ.RotateY(theta);
-    Z2ToZ.RotateY(TMath::Pi()+theta);
-    
-    
-    //fermons 4 vectors in vector boson rest frame
-    
-    TLorentzVector p3Z((M1/2)*sin(theta1)*cos(phi1),(M1/2)*sin(theta1)*sin(phi1),(M1/2)*cos(theta1),(M1/2)*1);
-       
-    TLorentzVector p4Z(-(M1/2)*sin(theta1)*cos(phi1),-(M1/2)*sin(theta1)*sin(phi1),-(M1/2)*cos(theta1),(M1/2)*1);
-      
-    TLorentzVector p5G((M2)*sin(theta2)*cos(phi2),(M2)*sin(theta2)*sin(phi2),(M2)*cos(theta2),(M2)*1);
-    
-    //TLorentzVector p6Z2(-(M2/2)*sin(theta2)*cos(phi2),-(M2/2)*sin(theta2)*sin(phi2),-(M2/2)*cos(theta2),(M2/2)*1);
-      
-    
-    // fermions 4 vectors in CM frame
-    
-    TLorentzVector p3CM,p4CM,p5CM,p6CM;
-    
-    p3CM=Z1ToZ*p3Z;
-    p4CM=Z1ToZ*p4Z;
-    p5CM=Z2ToZ*p5G;
-    //p6CM=Z2ToZ*p6Z2;
-    
-    vector<TLorentzVector> p;
-    
-    p.push_back(p3CM);
-    p.push_back(p4CM);
-    p.push_back(p5CM);
-    //p.push_back(p6CM);http://www.chiralcomp.com/support/mixing_f77_c_cpp/
-
-    return p;
-}
-
-
 
 //###################
 //# main function
@@ -113,34 +49,37 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 
   TFile* fin = new TFile(inputDir+fileName);
 
+  //Output file 1: Matrix Element Calculations (Stored in Branches)
   TString outFileName = outputDir+fileName;
   outFileName.ReplaceAll(".root","_ME.root");
   cout << outFileName <<endl;
+  TFile *newfile = new TFile(outFileName, "recreate");
+  
+  //Output file 2: Histograms (weighted from MCFM)
+  TString histFileName = outputDir+fileName;
+  histFileName.ReplaceAll(".root","_AnglePlots.root");
+  cout << histFileName <<endl;
+  TFile *histfile = new TFile(histFileName, "RECREATE");
 
-  TFile *newfile = new TFile(outFileName,"recreate");
-
+  newfile->cd();
   TTree* ch=(TTree*)fin->Get("h300"); 
   if (ch==0x0) return; 
   TTree* evt_tree=(TTree*) ch->CloneTree(0, "fast");
   evt_tree->SetName("newTree");
+
+  //------------------------------
+  //       Input Variables
+  //------------------------------
+
+  //Weight from MCFM-Produced Files
+  float weight = 0.;
+  ch->SetBranchAddress("wt", &weight);
+
   //For Reading in components of TLorentzVectors individually.
 
   float l_minus_px(0.), l_minus_py(0.), l_minus_pz(0.), l_minus_e(0.);
   float l_plus_px(0.), l_plus_py(0.), l_plus_pz(0.), l_plus_e(0.);
   float gamma_px(0.), gamma_py(0.), gamma_pz(0.), gamma_e(0.);
-
-  ch->SetBranchAddress("l_minus_px", &l_minus_px);
-  ch->SetBranchAddress("l_minus_py", &l_minus_py);
-  ch->SetBranchAddress("l_minus_pz", &l_minus_pz);
-  ch->SetBranchAddress("l_minus_e", &l_minus_e);
-  ch->SetBranchAddress("l_plus_px", &l_plus_px);
-  ch->SetBranchAddress("l_plus_py", &l_plus_py);
-  ch->SetBranchAddress("l_plus_pz", &l_plus_pz);
-  ch->SetBranchAddress("l_plus_e", &l_plus_e);
-  ch->SetBranchAddress("gamma_px", &gamma_px);
-  ch->SetBranchAddress("gamma_py", &gamma_py);
-  ch->SetBranchAddress("gamma_pz", &gamma_pz);
-  ch->SetBranchAddress("gamma_e", &gamma_e);
 
   ch->SetBranchAddress("px3", &l_minus_px);
   ch->SetBranchAddress("py3", &l_minus_py);
@@ -155,8 +94,6 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   ch->SetBranchAddress("pz5", &gamma_pz);
   ch->SetBranchAddress("E5", &gamma_e);
 
-  
-
   //For Reading in TLorentzVectors as a whole
   /*
   TBranch *b_l_minus; TBranch *b_l_plus; TBranch *b_gamma;
@@ -167,26 +104,19 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   ch->SetBranchAddress("l_plus", &l_plus_event, &b_l_plus);
   ch->SetBranchAddress("gamma", &gamma_event, &b_gamma);
   */
-  // output variables
-  //float dXsec_ZZ_MCFM = 0.;
-  //float dXsec_HZZ_MCFM = 0.;
+
+  //------------------------
+  //      Output Files
+  //------------------------
+
+  // output variables (in _ME.root file)
   float dXsec_ZGam_MCFM = 0.;
   float dXsec_HZGam_MCFM = 0.;
   float Discriminant = 0.;
   float PreBoostMass = 0.;
   float PostBoostMass = 0.;
   float logBkg(0.), logSig(0.);
-  float CosT_lp = 0.;
-  float CosT_lm = 0.;
-  float Phi_lp = 0.;
-  float CosTZG = 0.;
-  float PtG = 0.;
-  float Eta_lp = 0.;
-  float Eta_lm = 0.;
-  float Eta_g = 0.;
 
-  //evt_tree->Branch("dXsec_ZZ_MCFM"   , &dXsec_ZZ_MCFM   ,"dXsec_ZZ_MCFM/F");
-  //evt_tree->Branch("dXsec_HZZ_MCFM"  , &dXsec_HZZ_MCFM   ,"dXsec_HZZ_MCFM/F");
   evt_tree->Branch("dxSec_ZGam_MCFM"   , &dXsec_ZGam_MCFM ,"dXsec_ZGam_MCFM/F");
   evt_tree->Branch("dxSec_HZGam_MCFM"   , &dXsec_HZGam_MCFM ,"dXsec_HZGam_MCFM/F");
   evt_tree->Branch("logBkg", &logBkg, "logBkg/F");
@@ -194,38 +124,26 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   evt_tree->Branch("Discriminant", &Discriminant, "Discriminant/F");
   evt_tree->Branch("PreBoostMass", &PreBoostMass, "PreBoostMass/F");
   evt_tree->Branch("PostBoostMass", &PostBoostMass, "PostBoostMass/F");
-  evt_tree->Branch("CosT_lp", &CosT_lp, "Cos(#theta) Positive Lepton/F");
-  evt_tree->Branch("CosT_lm", &CosT_lm, "Cos(#theta) Negative Lepton/F");
-  evt_tree->Branch("Phi_lp", &Phi_lp, "#phi of Positive Lepton/F");
-  evt_tree->Branch("CosTZG", &CosTZG, "Cos(#Theta) of ZG System/F");
-  evt_tree->Branch("PtG", &PtG, "Pt of Photon/F");
-  evt_tree->Branch("Eta_lp", &Eta_lp, "Eta of Positive Lepton/F");
-  evt_tree->Branch("Eta_lm", &Eta_lm, "Eta of Negative Lepton/F");
-  evt_tree->Branch("Eta_g", &Eta_g, "Eta of Photon/F");
-  
 
-// input variables 
-  /*
-  float m1,m2,h1,h2,hs,phi,phi1,mzg;  
-  ch->SetBranchAddress( "ZMass"        , &m1      );   
-  ch->SetBranchAddress( "GamMass"        , &m2      );   
-  ch->SetBranchAddress( "helcosthetaZ" , &h1      );   
-  ch->SetBranchAddress( "helcosthetaGam" , &h2      );   
-  ch->SetBranchAddress( "costhetastar"  , &hs      );   
-  ch->SetBranchAddress( "helphi"        , &phi     );   
-  ch->SetBranchAddress( "phistarZ"     , &phi1    );   
-  ch->SetBranchAddress( "ZGamMass"        , &mzg     );   
-  */
-  /*
-  ch->SetBranchAddress( "Z1Mass"        , &m1      );   
-  ch->SetBranchAddress( "Z2Mass"        , &m2      );   
-  ch->SetBranchAddress( "helcosthetaZ1" , &h1      );   
-  ch->SetBranchAddress( "helcosthetaZ2" , &h2      );   
-  ch->SetBranchAddress( "costhetastar"  , &hs      );   
-  ch->SetBranchAddress( "helphi"        , &phi     );   
-  ch->SetBranchAddress( "phistarZ1"     , &phi1    );   
-  ch->SetBranchAddress( "ZZMass"        , &mzg     );   
-  */
+  //User-defined Histograms (_AnglePlots.root file)
+  histfile->cd();
+  TH1F* CosT_lp = new TH1F("CosT_lp", "Cos(#theta) positive lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1);
+  TH1F* CosT_lm = new TH1F("CosT_lm", "Cos(#theta) negative lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1);
+  TH1F* Phi_lp = new TH1F("Phi_lp", "#phi positive lepton;#phi;N_{evts}", 50, -3.2, 3.2);
+  TH1F* CosTZG = new TH1F("CosTZG", "Cos(#Theta) ZG system;cos(#Theta);N_{evts}", 50, -1.1, 1.1);
+  TH1F* Pt_g = new TH1F("Pt_g", "Pt of photon in ZG System;Pt;N_{evts}", 50, 0., 200.);
+  TH1F* Pt_lp = new TH1F("Pt_lp", "Pt of positive lepton;Pt;N_{evts}", 50, 0., 200.);
+  TH1F* Pt_lm = new TH1F("Pt_lm", "Pt of negative lepton;Pt;N_{evts}", 50, 0., 200.);
+  TH1F* eta_g = new TH1F("eta_g", "Eta of Photon", 50, -5.0, 5.0);
+  TH1F* eta_lp = new TH1F("eta_lp", "Eta of positive lepton;#eta;N_{evts}", 50, -5.0, 5.0);
+  TH1F* eta_lm = new TH1F("eta_lm", "Eta of negative lepton;#eta;N_{evts}", 50, -5.0, 5.0);
+  TH1F* mzg = new TH1F("mzg", "Mass of Z-Gamma System;Mass;N_{evts}", 100, 50, 200);
+  TH1F* mz = new TH1F("mz", "Mass of Z Boson;Mass;N_{evts}", 100, 0, 150);
+  TH1F* Pb = new TH1F("Pb", "Background Probability (weighted);dXsec_ZGam;N_{evts}", 100, 0, .0001);
+  TH1F* Ps = new TH1F("Ps", "Signal Probability (weighted);dXsec_HZGam;N_{evts}", 100, 0, .0001);
+  TH1F* WD = new TH1F("WD", "Weighted Discriminant;D;N_{evts}", 100, 0, 20);
+
+
 
   // Create the instance of TEvtProb to calculate the differential cross-section
   TEvtProb Xcal2;  
@@ -246,24 +164,21 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     if (verbosity >= TVar::INFO && (ievt % 1000 == 0)) 
       std::cout << "Doing Event: " << ievt << std::endl;
     
-    // 
-    // initialise the differential cross-sections
-    // 
+    //-------------------------------------------
+    // initialize the differential cross-sections
+    // and other output variables
+    //-------------------------------------------
     dXsec_ZGam_MCFM = 0.;
     dXsec_HZGam_MCFM = 0.;
     Discriminant = 0;
     PreBoostMass = 0;
     PostBoostMass = 0;
-    CosT_lp = 0; CosT_lm = 0; Phi_lp = 0; CosTZG = 0; PtG = 0; Eta_lp = 0; Eta_lm = 0; Eta_g = 0;
 
     ch->GetEntry(ievt);
 
-    // set four momenta
-    //vector<TLorentzVector> p;
-    //p=Calculate4Momentum(mzg,m1,m2,acos(hs),acos(h1),acos(h2),phi1,phi);
-
     TLorentzVector p0, p1, p2, psum;
     TVector3 bv;
+
     //When Pulled from Components
     p0.SetPxPyPzE(l_minus_px, l_minus_py, l_minus_pz, l_minus_e);
     p1.SetPxPyPzE(l_plus_px, l_plus_py, l_plus_pz, l_plus_e);
@@ -281,7 +196,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     p1.Boost(bv);
     p2.Boost(bv);
 
+    //--------------------
     //Calculating ZGAngles
+    //--------------------
     ZGLabVectors genLevelInputs;
     ZGAngles genLevelOutputs;
 
@@ -293,16 +210,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     
     getZGAngles(genLevelInputs,genLevelOutputs, false);
 
-    CosT_lp = genLevelOutputs.costheta_lp;
-    CosT_lm = genLevelOutputs.costheta_lm;
-    Phi_lp = genLevelOutputs.phi;
-    CosTZG = genLevelOutputs.cosTheta;
-    PtG = genLevelOutputs.ptg;
-    Eta_lp = genLevelOutputs.etal1;
-    Eta_lm = genLevelOutputs.etal2;
-    Eta_g = genLevelOutputs.etag;
-
+    //----------------------------------------------------
     //Making cuts from Campbell/Ellis/Giele/Williams Paper
+    //----------------------------------------------------
     if ((genLevelOutputs.ptg < 15.0) ||
 	(std::abs(genLevelOutputs.etal1) > 2.0) ||
 	(std::abs(genLevelOutputs.etal2) > 2.0) ||
@@ -319,6 +229,26 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 	std::cout << "Event does not pass cuts" << endl;
       continue;
     }
+
+    //-------------------------------------------------
+    //        Filling User-Defined Histograms
+    //-------------------------------------------------
+    CosT_lp->Fill(genLevelOutputs.costheta_lp, weight);
+    CosT_lm->Fill(genLevelOutputs.costheta_lm, weight);
+    Phi_lp->Fill(genLevelOutputs.phi, weight);
+    CosTZG->Fill(genLevelOutputs.cosTheta, weight);
+    Pt_g->Fill(genLevelOutputs.ptg, weight);
+    Pt_lp->Fill(genLevelOutputs.ptl1, weight);
+    Pt_lm->Fill(genLevelOutputs.ptl2, weight);
+    eta_g->Fill(genLevelOutputs.etag, weight);
+    eta_lp->Fill(genLevelOutputs.etal1, weight);
+    eta_lm->Fill(genLevelOutputs.etal2, weight);
+    mzg->Fill(genLevelOutputs.mzg, weight);
+    mz->Fill(genLevelOutputs.mz, weight);
+
+    //----------------------------------------------------------------------
+    //     Setting Up hzgamma_event for MCFM Matrix Element Calculation
+    //----------------------------------------------------------------------
 
     TLorentzVector Z_minus = p0;
     TLorentzVector Z_plus  = p1;
@@ -355,16 +285,19 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     } 
     // finish loading event information
     
-    // ==== Begin the differential cross-section calculation
+    // ==== Begin the differential cross-section calculation ====
     Xcal2.SetHiggsMass(zgammass);
     Xcal2.SetMatrixElement(TVar::MCFM);
-    //dXsec_ZZ_MCFM = Xcal2.XsecCalc(TVar::ZZ_2e2m, TVar::GG, hzz4l_event,verbosity);
-    //dXsec_HZZ_MCFM = Xcal2.XsecCalc(TVar::HZZ_4l, TVar::GG, hzz4l_event,verbosity);
     dXsec_ZGam_MCFM = Xcal2.XsecCalc(TVar::qqb_zgam, TVar::QQB, hzgamma_event,verbose);
     dXsec_HZGam_MCFM = Xcal2.XsecCalc(TVar::gg_hzgam, TVar::GG, hzgamma_event,verbose);
+    Pb->Fill(dXsec_ZGam_MCFM, weight);
+    Ps->Fill(dXsec_HZGam_MCFM, weight);
+
     logBkg = -log10(dXsec_ZGam_MCFM);
     logSig = -log10(dXsec_HZGam_MCFM);
     Discriminant = -log(dXsec_ZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
+    WD->Fill(Discriminant, weight);
+
     if (dXsec_HZGam_MCFM > 10000000000)
       {
 	std::cout << "HUGE XSEC" << endl;
@@ -377,8 +310,10 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   
   if (verbosity >= TVar::INFO) cout << "TotCalculatedEvts: " << evt_tree->GetEntries() <<endl; 
   
-  newfile->cd(); 
+  newfile->cd();
   evt_tree->Write(); 
   newfile->Close();
-  
+  histfile->cd();
+  histfile->Write();
+  histfile->Close();
 }  
