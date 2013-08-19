@@ -83,7 +83,7 @@ void My_choose(TVar::Process process){
   
     // these settings are identical to use the chooser_() function
     // these settings are  from 
-    // ProdHep/chooser.f
+    // Procdep/chooser.f
 
     npart_.npart=4;
     nqcdjets_.nqcdjets=0;

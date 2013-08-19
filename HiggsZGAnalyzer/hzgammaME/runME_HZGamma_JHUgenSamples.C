@@ -140,9 +140,10 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   TH1F* mzg = new TH1F("mzg", "Mass of Z-Gamma System;Mass;N_{evts}", 100, 50, 200);
   TH1F* mz = new TH1F("mz", "Mass of Z Boson;Mass;N_{evts}", 100, 0, 150);
   TH1F* Pb = new TH1F("Pb", "Background Probability (weighted);dXsec_ZGam;N_{evts}", 100, 0, .0001);
+  TH1F* logPb = new TH1F("logPb", "Log of Background Probability (weighted);-logPb;N_{evts}", 110, -1.0, 10.0); 
   TH1F* Ps = new TH1F("Ps", "Signal Probability (weighted);dXsec_HZGam;N_{evts}", 100, 0, .0001);
-  TH1F* WD = new TH1F("WD", "Weighted Discriminant;D;N_{evts}", 100, 0, 20);
-
+  TH1F* logPs = new TH1F("logPs", "Log of Signal Probability (weighted);-logPs;N_{evts}", 110, -1.0, 10.0);
+  TH1F* WD = new TH1F("WD", "Weighted Discriminant;D;N_{evts}", 1000, 0, 10);
 
 
   // Create the instance of TEvtProb to calculate the differential cross-section
@@ -189,13 +190,6 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     //p1.SetPxPyPzE(l_plus_event->Px(), l_plus_event->Py(), l_plus_event->Pz(), l_plus_event->Energy());
     //p2.SetPxPyPzE(gamma_event->Px(), gamma_event->Py(), gamma_event->Pz(), gamma_event->Energy());
     
-    psum = p0 + p1 + p2;
-    PreBoostMass = psum.M();
-    bv = -psum.BoostVector();
-    p0.Boost(bv);
-    p1.Boost(bv);
-    p2.Boost(bv);
-
     //--------------------
     //Calculating ZGAngles
     //--------------------
@@ -209,6 +203,13 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     genLevelInputs.veclp = p1;
     
     getZGAngles(genLevelInputs,genLevelOutputs, false);
+
+    psum = p0 + p1 + p2;
+    PreBoostMass = psum.M();
+    bv = -psum.BoostVector();
+    p0.Boost(bv);
+    p1.Boost(bv);
+    p2.Boost(bv);
 
     //----------------------------------------------------
     //Making cuts from Campbell/Ellis/Giele/Williams Paper
@@ -291,7 +292,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     dXsec_ZGam_MCFM = Xcal2.XsecCalc(TVar::qqb_zgam, TVar::QQB, hzgamma_event,verbose);
     dXsec_HZGam_MCFM = Xcal2.XsecCalc(TVar::gg_hzgam, TVar::GG, hzgamma_event,verbose);
     Pb->Fill(dXsec_ZGam_MCFM, weight);
+    logPb->Fill(-log10(dXsec_ZGam_MCFM),weight);
     Ps->Fill(dXsec_HZGam_MCFM, weight);
+    logPs->Fill(-log10(dXsec_HZGam_MCFM),weight);
 
     logBkg = -log10(dXsec_ZGam_MCFM);
     logSig = -log10(dXsec_HZGam_MCFM);
