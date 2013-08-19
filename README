@@ -1,5 +1,69 @@
-The Full Higgs -> ZG analyzer for NWU group, by Brian Pollack.
-This analyzer is built to run on NWU ntuples only.
-Scripts folder contains useful functions, not all directly related to HZG.
-This analyzer has the capability to calculate MCFM Matrix Elements at Leading-Order
-TEST...TEST...
+###############################################################################################
+##Higgs/ZG Analyzer Built by Brian Pollack, adapted by Kevin Kelly with help from Yanyan Gao.##
+###############################################################################################
+
+This package is capable of analyzing Northwestern NuTuples and producing usable TLorentzVectors for further analysis, namely using for calculating Matrix Element method probabilities for Higgs to ZG Production and background, namely QQB Production of 2 lepton/1 gamma final states.
+
+-----------------------------------------
+To run HZG Analyzer (from Brian Pollack):
+-----------------------------------------
+Use simpleRunner.csh in the directory HiggsZGAnalyzer/ in the following context:
+"./simpleRunner.csh SOURCEFILE", where SOURCEFILE is the name of a text file (ending in .txt) in the sourceFiles/ directory. These files specify input .root files.
+
+The output is two root files: "simpleHistograms_SOURCEFILE.root" and "simpleHistograms_SOURCEFILE_4Vec.root"
+--"simpleHistograms_SOURCEFILE.root" contains histograms of the "ZGAngles" (see directory HiggsZGAnalyzer/plugins/ZGAngles.cc for more information) process.
+--"simpleHistograms_SOURCEFILE_4Vec.root" contains a tree named "K" with three branches: "l_minus", "l_plus", and "gamma", each filled with TLorentzVectors of the negative lepton, positive lepton, and photon identified in each event, respectively. These branches are only filled for events with all three of these particles found in generator level information.
+
+All output file/tree names can be changed in HiggsZGAnalyzer/simple_Template.C in the "Begin" process (lines 44-62)
+
+----------------------------------------------------------------------------------------------
+To run Matrix Element Calculator (adapted by Kevin Kelly from H->ZZ->4l code from Yanyan Gao):
+----------------------------------------------------------------------------------------------
+Use runME_HZGamma_JHUgenSamples.C in the directory HiggsZGAnalyzer/hzgammaME in the following context:
+"
+root -l -b
+.L runME_HZGamma_JHUgenSamples.C+
+runME_HZGamma_JHUgenSamples("INPUT_DIR", "INPUT_FILE", "OUTPUT_DIR", MAX_EVTS, VERBOSITY_LEVEL)
+"
+-INPUT_DIR: the input directory of root input files. These can be either trees of TLorentzVectors (as from HZG Analyzer) or of individual momenta of the particles.
+-INPUT_FILE: the input file's name, with extension.
+-OUTPUT_DIR: name of directory in which the two output files are generated
+-MAX_EVTS: total number of events to run over. Can be greater than number in the file - program picks out whichever is smaller.
+-VERBOSITY_LEVEL: 	0 Off
+			1 Debug
+			2 Verbose
+
+The output is two root files in OUTPUT_DIR: "INPUT_FILE_ME.root" and "INPUT_FILE_AnglePlots.root"
+--"INPUT_FILE_ME.root" contains the original elements of INPUT_FILE in additon to branches of the Signal and Background probability of the event and a user-defined discriminant. Currently, this is -log10(Pb/(Ps+Pb)), where Pb is the background probability and Ps is signal probability
+--"INPUT_FILE_AnglePlots.root" performs the calculations from ZGAngles (as in HZG Analyzer) and contains histograms of these angles, as well as the Pt of each particle, invariant mass of the lepton pair, and the total system. All of these plots are weighted and an event weight can be read in (as from an LHE file), or can be set to be 1.0 uniformly.
+
+
+	--------------
+	Input Methods:
+	--------------
+	--The tree name in the input file must match what is specified in runME_HZGamma_JHUgenSamples.C on line 65.
+	--If using a root file with individual components of 4-Vectors, use lines 81-96 under "Input Variables", ensuring that the portions in quotes match those from the input file. Also, make sure that lines 185-186 are not commented out, and lines 190-192 are commented out.
+	--If using a root file with TLorentzVectors, use lines 100-106, ensuring that the portions in quotes match the names of the branches in the input file. Also, make sure that lines 190-192 are not commented out, and lines 185-187 are commented out.
+	--For uniformly weighted events (i.e. no weight is included), use line 77, and comment out line 76.
+
+	-------------
+	Output Plots:
+	-------------
+	--To modify/create output branches of the "INPUT_FILE_ME.root" file, edit lines 114-127. 
+	--To modify/create output histograms of the "INPUT_FILE_AnglePlots.root" file, edit lines 131-147. These events are filled in lines 236-247, and also 301-309.
+	--To change output file names, modify the extensions in the ReplaceAll function called in lines 54 (_ME.root) and 60 (_AnglePlots.root).
+
+	-----------------
+	Cuts Implemented:
+	-----------------
+	--The following cuts are made, as per the HZG Working Group:
+	|eta_lepton| < 2.5
+	|eta_gamma| < 2.5
+	M_ll > 50.0
+	M_zg > 100.0
+	M_zg + M_ll > 185.0
+	Pt_leading_lepton > 20.0
+	Pt_trailing_lepton > 10.0
+	DeltaR(lepton, gamma) > 0.4
+
+For questions/assistance, contact Kevin Kelly at kkelly12@u.northwestern.edu
