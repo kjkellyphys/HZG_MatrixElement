@@ -96,30 +96,30 @@ c--- Branching ratio H -> Zgam
 
 *************************** WRITE OUT BRANCHING RATIOS *************************
 
-      write(6,99) hmass,hwidth,br,tautaubr,wwbr,zzbr,gamgambr,zgambr
-      if (spira) then
-      write(6,*) '*                                                  *'
-      write(6,*) '* Note: branching ratios reported here can be > 1  *'
-      write(6,*) '*       since the total Higgs width is calculated  *'
-      write(6,*) '*       at NLO but the BR calculation uses a       *'
-      write(6,*) '*       partial width at LO only.                  *'
-      write(6,*) '*                                                  *'
-      write(6,*) '****************************************************'
-      endif
+c      write(6,99) hmass,hwidth,br,tautaubr,wwbr,zzbr,gamgambr,zgambr
+c      if (spira) then
+c      write(6,*) '*                                                  *'
+c      write(6,*) '* Note: branching ratios reported here can be > 1  *'
+c      write(6,*) '*       since the total Higgs width is calculated  *'
+c      write(6,*) '*       at NLO but the BR calculation uses a       *'
+c      write(6,*) '*       partial width at LO only.                  *'
+c      write(6,*) '*                                                  *'
+c      write(6,*) '****************************************************'
+c      endif
 
       return
 
- 99   format(/,
-     .       ' ****************** Higgs parameters ****************'/, 
-     .       ' *                                                  *'/, 
-     .       ' *   mass(H) = ',f7.2,'      width(H) = ',e12.5,' *'/,
-     .       ' *                                                  *'/, 
-     .       ' *              Br( H -> b bbar)  = ',f9.5,'       *'/,
-     .       ' *              Br( H -> tau tau) = ',f9.5,'       *'/,
-     .       ' *              Br( H -> W W)     = ',f9.5,'       *'/,
-     .       ' *              Br( H -> Z Z)     = ',f9.5,'       *'/,
-     .       ' *              Br( H -> gam gam) = ',f9.5,'       *'/,
-     .       ' *              Br( H -> Z gam)   = ',f9.5,'       *'/,
-     .       ' ****************************************************')
+c 99   format(/,
+c     .       ' ****************** Higgs parameters ****************'/, 
+c     .       ' *                                                  *'/, 
+c     .       ' *   mass(H) = ',f7.2,'      width(H) = ',e12.5,' *'/,
+c     .       ' *                                                  *'/, 
+c     .       ' *              Br( H -> b bbar)  = ',f9.5,'       *'/,
+c     .       ' *              Br( H -> tau tau) = ',f9.5,'       *'/,
+c     .       ' *              Br( H -> W W)     = ',f9.5,'       *'/,
+c     .       ' *              Br( H -> Z Z)     = ',f9.5,'       *'/,
+c     .       ' *              Br( H -> gam gam) = ',f9.5,'       *'/,
+c     .       ' *              Br( H -> Z gam)   = ',f9.5,'       *'/,
+c     .       ' ****************************************************')
 
       end

@@ -169,18 +169,18 @@ c      write(6,*) 'twidth LO',twidth
 c      write(6,*) 'twidth NLO',twidth*topwidth(mt,wmass)
 c      write(6,*) 'twidth (NLO-LO)/LO = ',topwidth(mt,wmass)-1d0
 
-      write(6,*) '************** Electroweak parameters **************'
-      write(6,*) '*                                                  *'
-      write(6,75) 'zmass',inlabel(1),zmass,'wmass',inlabel(2),wmass
-      write(6,75) 'zwidth',inlabel(3),zwidth,'wwidth',inlabel(4),wwidth
-      write(6,76) 'Gf',inlabel(5),gf,'1/aemmz',inlabel(6),1d0/aemmz
-      write(6,75) 'xw',inlabel(7),xw,'mtop',inlabel(8),mt
-      write(6,75) 'gwsq',inlabel(9),gwsq,'esq',inlabel(10),esq
-      write(6,77) 'top width',twidth,tworder
-      write(6,78) 'mb',mb,'mc',mc
-      write(6,*) '*                                                  *'
-      write(6,*) '* Parameters marked (+) are input, others derived  *'
-      write(6,*) '****************************************************'
+c      write(6,*) '************** Electroweak parameters **************'
+c      write(6,*) '*                                                  *'
+c      write(6,75) 'zmass',inlabel(1),zmass,'wmass',inlabel(2),wmass
+c      write(6,75) 'zwidth',inlabel(3),zwidth,'wwidth',inlabel(4),wwidth
+c      write(6,76) 'Gf',inlabel(5),gf,'1/aemmz',inlabel(6),1d0/aemmz
+c      write(6,75) 'xw',inlabel(7),xw,'mtop',inlabel(8),mt
+c      write(6,75) 'gwsq',inlabel(9),gwsq,'esq',inlabel(10),esq
+c      write(6,77) 'top width',twidth,tworder
+c      write(6,78) 'mb',mb,'mc',mc
+c      write(6,*) '*                                                  *'
+c      write(6,*) '* Parameters marked (+) are input, others derived  *'
+c      write(6,*) '****************************************************'
 
    75 format(' * ',a6,a3,f13.7,3x,a7,a3,f12.7,'  *')
    76 format(' * ',a6,a3,d13.6,3x,a7,a3,f12.7,'  *')

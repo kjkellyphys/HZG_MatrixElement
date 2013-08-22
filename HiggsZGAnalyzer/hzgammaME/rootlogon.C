@@ -5,5 +5,6 @@
   gSystem->Load("libEG.so");
   gSystem->Load("./libmcfm_6p6.so");
   gSystem->Load("./libME.so");
+  gSystem->Load("./ExRootAnalysis/lib/libExRootAnalysis.so");
   gSystem->AddIncludePath("-I$ROOFITSYS/include/");
 }

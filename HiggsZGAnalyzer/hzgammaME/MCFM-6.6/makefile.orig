@@ -5,8 +5,8 @@ CERNLIB     =
 # Replace this with the location of LHAPDF on your system (if desired)
 LHAPDFLIB   = 
 
-MCFMHOME        = /home/johnmc/MCFM-6.6
-SOURCEDIR       = /home/johnmc/MCFM-6.6/src
+MCFMHOME        = /uscms/home/kkelly12/work/CMSSW_5_3_8/src/HZG_MatrixElement/HiggsZGAnalyzer/hzgammaME/MCFM-6.6
+SOURCEDIR       = /uscms/home/kkelly12/work/CMSSW_5_3_8/src/HZG_MatrixElement/HiggsZGAnalyzer/hzgammaME/MCFM-6.6/src
 VPATH		= $(DIRS)
 BIN		= $(MCFMHOME)/Bin
 INCPATH  	= $(SOURCEDIR)/Inc
@@ -32,10 +32,10 @@ PDFROUTINES = NATIVE
 NTUPLES = NO
 
 FC = gfortran
-FFLAGS 	= -fno-automatic -fno-f2c -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -Iobj
+FFLAGS 	= -fno-automatic -fno-f2c -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -Iobj
 
 F90 = gfortran
-F90FLAGS = -fno-automatic -fno-f2c  -g -I$(INCPATH) -Iobj -Jobj
+F90FLAGS = -fno-automatic -fno-f2c -O2 -fPIC  -g -I$(INCPATH) -Iobj -Jobj
 
 
 # If using FROOT package for ROOT ntuples, first specify C++ compiler:

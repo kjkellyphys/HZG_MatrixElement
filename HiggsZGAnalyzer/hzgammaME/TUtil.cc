@@ -30,19 +30,6 @@ void My_choose(TVar::Process process){
     //c--     '  f(p1)+f(p2) --> Z^0 (no BR) +gamma(p5)' (removebr=.true.)
     nproc_.nproc=300;
     chooser_();
-
-    npart_.npart=3;
-    nqcdjets_.nqcdjets=0;
-    bveg1_mcfm_.ndim=7;
-    breit_.n2=0;
-    breit_.n3=1;
-    breit_.mass3=masses_mcfm_.zmass;
-    breit_.width3=masses_mcfm_.zwidth;
-    nwz_.nwz=0;
-
-    zcouple_.q1=-1.0;
-    zcouple_.l1=zcouple_.le;
-    zcouple_.r1=zcouple_.re;
   }
   /*
   //GG->Z+Gamma
@@ -57,21 +44,8 @@ void My_choose(TVar::Process process){
     //c--      '  f(p1)+f(p2) -breit_.n2=0;
     nproc_.nproc=120;
     chooser_();
-    breit_.n3=1;
-    breit_.mass3=masses_mcfm_.zmass;
-    breit_.width3=masses_mcfm_.zwidth;
-    npart_.npart=3;
-    nqcdjets_.nqcdjets=0;
-    
-    zcouple_.q1=-1.0;
-    zcouple_.l1=zcouple_.le;
-    zcouple_.r1=zcouple_.re;
-
-    breit_.n2=0;
-    breit_.n3=1;
-    breit_.mass3=masses_mcfm_.zmass;
-    breit_.width3=masses_mcfm_.zwidth;
   }
+
   /*
   //ZZ_4l
   if(process==TVar::ZZ_2e2m){
@@ -145,7 +119,7 @@ http://www.chiralcomp.com/support/mixing_f77_c_cpp/
 
 bool My_masscuts(double s[][12],TVar::Process process){
 
- double minZmassSqr=10*10;
+  //double minZmassSqr=10*10;
 
  //if(process==TVar::ZZ_2e2m) {
  //  if(s[2][3]< minZmassSqr) return true;

@@ -83,17 +83,17 @@
 \contentsline {subsection}{\numberline {8.61}$Zt$ and $Z\mathaccent "7016\relax {t}$ production, processes 560--569}{60}{subsection.8.61}
 \contentsline {subsection}{\numberline {8.62}$Ht{\mathaccent "7016\relax t}$ production, processes 640--660}{60}{subsection.8.62}
 \contentsline {subsection}{\numberline {8.63}Dark Matter Processes Mono-jet and Mono-photon 800-848}{61}{subsection.8.63}
-\contentsline {section}{\numberline {A}MCFM references}{65}{appendix.A}
-\contentsline {section}{\numberline {B}Processes included in MCFM}{69}{appendix.B}
-\contentsline {section}{\numberline {C}Version 6.6 changelog}{78}{appendix.C}
-\contentsline {section}{\numberline {D}Version 6.5 changelog}{78}{appendix.D}
-\contentsline {section}{\numberline {E}Version 6.4 changelog}{78}{appendix.E}
+\contentsline {section}{\numberline {A}MCFM references}{65}{section.A}
+\contentsline {section}{\numberline {B}Processes included in MCFM}{69}{section.B}
+\contentsline {section}{\numberline {C}Version 6.6 changelog}{78}{section.C}
+\contentsline {section}{\numberline {D}Version 6.5 changelog}{78}{section.D}
+\contentsline {section}{\numberline {E}Version 6.4 changelog}{78}{section.E}
 \contentsline {subsection}{\numberline {E.1}Code changes}{78}{subsection.E.1}
-\contentsline {section}{\numberline {F}Version 6.3 changelog}{79}{appendix.F}
+\contentsline {section}{\numberline {F}Version 6.3 changelog}{79}{section.F}
 \contentsline {subsection}{\numberline {F.1}Code changes}{79}{subsection.F.1}
-\contentsline {section}{\numberline {G}Version 6.2 changelog}{80}{appendix.G}
+\contentsline {section}{\numberline {G}Version 6.2 changelog}{80}{section.G}
 \contentsline {subsection}{\numberline {G.1}Input file changes}{80}{subsection.G.1}
 \contentsline {subsection}{\numberline {G.2}Code changes}{81}{subsection.G.2}
-\contentsline {section}{\numberline {H}Version 6.1 changelog}{82}{appendix.H}
+\contentsline {section}{\numberline {H}Version 6.1 changelog}{82}{section.H}
 \contentsline {subsection}{\numberline {H.1}Input file changes}{82}{subsection.H.1}
 \contentsline {subsection}{\numberline {H.2}Code changes}{83}{subsection.H.2}
