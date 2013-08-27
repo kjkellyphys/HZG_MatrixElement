@@ -49,6 +49,13 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 
   TFile* fin = new TFile(inputDir+fileName);
 
+  ofstream KKTxt;
+  bool Signal = false;
+  KKTxt.open ("./TxtOutput/Discriminant.txt");
+
+  ofstream CutTxt;
+  CutTxt.open("CutFile.txt");
+
   //Output file 1: Matrix Element Calculations (Stored in Branches)
   TString outFileName = outputDir+fileName;
   outFileName.ReplaceAll(".root","_ME.root");
@@ -62,7 +69,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   TFile *histfile = new TFile(histFileName, "RECREATE");
 
   newfile->cd();
-  TTree* ch=(TTree*)fin->Get("h300"); 
+  TTree* ch=(TTree*)fin->Get("K"); 
   if (ch==0x0) return; 
   TTree* evt_tree=(TTree*) ch->CloneTree(0, "fast");
   evt_tree->SetName("newTree");
@@ -73,11 +80,11 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 
   //Weight from MCFM-Produced Files
   float weight = 0.;
-  ch->SetBranchAddress("wt", &weight);
-  //weight = 1.0; //For uniform weight.
+  //ch->SetBranchAddress("wt", &weight);
+  weight = 1.0; //For uniform weight.
   
   //For Reading in components of TLorentzVectors individually.
-  
+  /*
   float l_minus_px(0.), l_minus_py(0.), l_minus_pz(0.), l_minus_e(0.);
   float l_plus_px(0.), l_plus_py(0.), l_plus_pz(0.), l_plus_e(0.);
   float gamma_px(0.), gamma_py(0.), gamma_pz(0.), gamma_e(0.);
@@ -94,9 +101,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   ch->SetBranchAddress("py5", &gamma_py);
   ch->SetBranchAddress("pz5", &gamma_pz);
   ch->SetBranchAddress("E5", &gamma_e);
-  
+  */
   //For Reading in TLorentzVectors as a whole
-  /*
+  
   TBranch *b_l_minus; TBranch *b_l_plus; TBranch *b_gamma;
   TLorentzVector *l_minus_event, *l_plus_event, *gamma_event;
   l_minus_event = 0; l_plus_event = 0; gamma_event = 0;
@@ -104,7 +111,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   ch->SetBranchAddress("l_minus", &l_minus_event, &b_l_minus);
   ch->SetBranchAddress("l_plus", &l_plus_event, &b_l_plus);
   ch->SetBranchAddress("gamma", &gamma_event, &b_gamma);
-  */
+  
 
   //------------------------
   //      Output Files
@@ -203,14 +210,14 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     TVector3 bv;
 
     //When Pulled from Components
-    p0.SetPxPyPzE(l_minus_px, l_minus_py, l_minus_pz, l_minus_e);
-    p1.SetPxPyPzE(l_plus_px, l_plus_py, l_plus_pz, l_plus_e);
-    p2.SetPxPyPzE(gamma_px, gamma_py, gamma_pz, gamma_e);
+    //p0.SetPxPyPzE(l_minus_px, l_minus_py, l_minus_pz, l_minus_e);
+    //p1.SetPxPyPzE(l_plus_px, l_plus_py, l_plus_pz, l_plus_e);
+    //p2.SetPxPyPzE(gamma_px, gamma_py, gamma_pz, gamma_e);
 
     //When Pulled from TLorentzVector
-    //p0.SetPxPyPzE(l_minus_event->Px(), l_minus_event->Py(), l_minus_event->Pz(), l_minus_event->Energy());
-    //p1.SetPxPyPzE(l_plus_event->Px(), l_plus_event->Py(), l_plus_event->Pz(), l_plus_event->Energy());
-    //p2.SetPxPyPzE(gamma_event->Px(), gamma_event->Py(), gamma_event->Pz(), gamma_event->Energy());
+    p0.SetPxPyPzE(l_minus_event->Px(), l_minus_event->Py(), l_minus_event->Pz(), l_minus_event->Energy());
+    p1.SetPxPyPzE(l_plus_event->Px(), l_plus_event->Py(), l_plus_event->Pz(), l_plus_event->Energy());
+    p2.SetPxPyPzE(gamma_event->Px(), gamma_event->Py(), gamma_event->Pz(), gamma_event->Energy());
     
     //--------------------
     //Calculating ZGAngles
@@ -232,6 +239,8 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     //----------------------------------------------------
     //Making cuts from H->ZG Analysis Group
     //----------------------------------------------------
+
+
     if ((genLevelOutputs.ptg < 15.0) ||
 	(std::abs(genLevelOutputs.etal1) > 2.5) ||
 	(std::abs(genLevelOutputs.etal2) > 2.5) ||
@@ -240,18 +249,40 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 	(genLevelOutputs.mzg < 100.0) ||
 	(genLevelOutputs.mzg + genLevelOutputs.mz < 185.0) ||
 	(std::abs(p0.DeltaR(p2)) < 0.4) ||
-	(std::abs(p1.DeltaR(p2)) < 0.4)){
-      if (verbosity >= TVar::DEBUG)
-	std::cout << "Event does not pass cuts" << endl;
+	(std::abs(p1.DeltaR(p2)) < 0.4) ||
+	((genLevelOutputs.ptl1 > genLevelOutputs.ptl2) && (genLevelOutputs.ptl1 < 20.0 || genLevelOutputs.ptl2 < 10.0)) ||
+	((genLevelOutputs.ptl2 > genLevelOutputs.ptl1) && (genLevelOutputs.ptl2 < 20.0 || genLevelOutputs.ptl1 < 10.0)))
+      {
+      if (verbosity >= TVar::DEBUG){
+	std::cout << "Event does not pass cuts:" << endl;
+      
+	CutTxt << "Event #" << ievt << " fails: " << endl;
+	
+	if (genLevelOutputs.ptg < 15.0)
+	  CutTxt << "Event fails photon-Pt Cut: Photon Pt = " << genLevelOutputs.ptg << endl;
+	if (std::abs(genLevelOutputs.etal1) > 2.5)
+	  CutTxt << "Event fails lepton-1 Eta Cut: Eta = " << genLevelOutputs.etal1 << endl;
+	if (std::abs(genLevelOutputs.etal2) > 2.5)
+	  CutTxt << "Event fails lepton-2 Eta Cut: Eta = " << genLevelOutputs.etal2 << endl;
+	if (std::abs(genLevelOutputs.etag) > 2.5)
+	  CutTxt << "Event fails Photon Eta Cut: Eta = " << genLevelOutputs.etag << endl;
+	if (genLevelOutputs.mz < 50.0)
+	  CutTxt << "Event fails z-mass cut: mz = " << genLevelOutputs.mz << endl;
+	if (genLevelOutputs.mzg < 100.0)
+	  CutTxt << "Event fails H-mass cut: mzg = " << genLevelOutputs.mzg << endl;
+	if (genLevelOutputs.mzg + genLevelOutputs.mz < 185.0)
+	  CutTxt << "Event fails H+z-mass cut: mzg + mz = " << genLevelOutputs.mzg + genLevelOutputs.mz << endl;
+	if (std::abs(p0.DeltaR(p2)) < 0.4)
+	  CutTxt << "Event fails lepton-1/gamma DR Cut: DR = " << p0.DeltaR(p2) << endl;
+	if (std::abs(p1.DeltaR(p2)) < 0.4)
+	  CutTxt << "Event fails lepton-2/gamma DR Cut: DR = " << p1.DeltaR(p2) << endl;
+	if ((genLevelOutputs.ptl1 > genLevelOutputs.ptl2) && (genLevelOutputs.ptl1 < 20.0 || genLevelOutputs.ptl2 < 10.0))
+	  CutTxt << "Event fails Lepton-Pt Cut: Pt1 = " << genLevelOutputs.ptl1 << " Pt2 = " << genLevelOutputs.ptl2 << endl;
+	if ((genLevelOutputs.ptl2 > genLevelOutputs.ptl1) && (genLevelOutputs.ptl2 < 20.0 || genLevelOutputs.ptl1 < 10.0))
+	  CutTxt << "Event fails Lepton-Pt Cut: Pt1 = " << genLevelOutputs.ptl1 << " Pt2 = " << genLevelOutputs.ptl2 << endl;
+      }
       continue;
     }
-    if (genLevelOutputs.ptl1 > genLevelOutputs.ptl2){
-      if (genLevelOutputs.ptl1 < 20.0 || genLevelOutputs.ptl2 < 10.0)
-	continue;
-    }
-    else
-      if (genLevelOutputs.ptl2 < 20.0 || genLevelOutputs.ptl1 < 10.0)
-	continue;  
 
     //-------------------------------------------------
     //        Filling User-Defined Histograms
@@ -349,6 +380,12 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     WD->Fill(Discriminant, weight);
     WD_UW->Fill(Discriminant);
 
+    KKTxt << Discriminant;
+    if (Signal)
+      KKTxt << " 0" << endl;
+    else
+      KKTxt << " 1" << endl;
+
     evt_tree->Fill();
     
   }//nevent
@@ -361,4 +398,6 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   histfile->cd();
   histfile->Write();
   histfile->Close();
+  KKTxt.close();
+  CutTxt.close();
 }  
