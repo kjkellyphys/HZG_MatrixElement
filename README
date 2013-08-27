@@ -67,3 +67,11 @@ The output is two root files in OUTPUT_DIR: "INPUT_FILE_ME.root" and "INPUT_FILE
 	DeltaR(lepton, gamma) > 0.4
 
 For questions/assistance, contact Kevin Kelly at kkelly12@u.northwestern.edu
+
+--------------
+Updates: 8/27:
+--------------
+Added capability to print out Discriminant (-log(Pb/(Ps+Pb))) in a text file (./TxtOutput/Discriminant.txt), along with a "type", given by the bool signal (defined L53).
+--This can be used to run over and find an optimal cut on D for signal-to-background ratio.
+Added output file "CutFile.txt" for an in-depth list of what events fail which cuts. This is only created/printed when the verbosity level (last input of the macro) is 2 or higher.
+--This file lists all cuts the event does not pass as well as the value for that specific variable.
