@@ -69,7 +69,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   TFile *histfile = new TFile(histFileName, "RECREATE");
 
   newfile->cd();
-  TTree* ch=(TTree*)fin->Get("K"); 
+  TTree* ch=(TTree*)fin->Get("h300"); 
   if (ch==0x0) return; 
   TTree* evt_tree=(TTree*) ch->CloneTree(0, "fast");
   evt_tree->SetName("newTree");
@@ -80,8 +80,8 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 
   //Weight from MCFM-Produced Files
   float weight = 0.;
-  //ch->SetBranchAddress("wt", &weight);
   weight = 1.0; //For uniform weight.
+  ch->SetBranchAddress("wt", &weight);
   
   //For Reading in components of TLorentzVectors individually.
   /*
@@ -154,28 +154,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   TH1F* logPs = new TH1F("logPs", "Log of Signal Probability (weighted);-logPs;N_{evts}", 110, -1.0, 10.0);
   TH1F* WD = new TH1F("WD", "Weighted Discriminant;D;N_{evts}", 1000, 0, 5);
 
-  //Unweighted Versions
-  TH1F* CosT_lp_UW = new TH1F("CosT_lp_UW", "Cos(#theta) positive lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1);
-  TH1F* CosT_lm_UW = new TH1F("CosT_lm_UW", "Cos(#theta) negative lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1);
-  TH1F* Phi_lp_UW = new TH1F("Phi_lp_UW", "#phi positive lepton;#phi;N_{evts}", 50, -3.2, 3.2);
-  TH1F* CosTZG_UW = new TH1F("CosTZG_UW", "Cos(#Theta) ZG system;cos(#Theta);N_{evts}", 50, -1.1, 1.1);
-  TH1F* Pt_g_UW = new TH1F("Pt_g_UW", "Pt of photon in ZG System;Pt;N_{evts}", 50, 0., 200.);
-  TH1F* Pt_lp_UW = new TH1F("Pt_lp_UW", "Pt of positive lepton;Pt;N_{evts}", 50, 0., 200.);
-  TH1F* Pt_lm_UW = new TH1F("Pt_lm_UW", "Pt of negative lepton;Pt;N_{evts}", 50, 0., 200.);
-  TH1F* eta_g_UW = new TH1F("eta_g_UW", "Eta of Photon", 50, -5.0, 5.0);
-  TH1F* eta_lp_UW = new TH1F("eta_lp_UW", "Eta of positive lepton;#eta;N_{evts}", 50, -5.0, 5.0);
-  TH1F* eta_lm_UW = new TH1F("eta_lm_UW", "Eta of negative lepton;#eta;N_{evts}", 50, -5.0, 5.0);
-  TH1F* mzg_UW = new TH1F("mzg_UW", "Mass of Z-Gamma System;Mass;N_{evts}", 100, 90, 150);
-  TH1F* mz_UW = new TH1F("mz_UW", "Mass of Z Boson;Mass;N_{evts}", 100, 0, 150);
-  TH1F* mz_precut_UW = new TH1F("mz_precut_UW", "Mass of Z Boson (before cut);N_{evts}", 100, 0, 150);
-  TH1F* Pb_UW = new TH1F("Pb_UW", "Background Probability;dXsec_ZGam;N_{evts}", 100, 0, .0001);
-  TH1F* logPb_UW = new TH1F("logPb_UW", "Log of Background Probability;-logPb;N_{evts}", 110, -1.0, 10.0); 
-  TH1F* Ps_UW = new TH1F("Ps_UW", "Signal Probability;dXsec_HZGam;N_{evts}", 100, 0, .0001);
-  TH1F* logPs_UW = new TH1F("logPs_UW", "Log of Signal Probability;-logPs;N_{evts}", 110, -1.0, 10.0);
-  TH1F* WD_UW = new TH1F("WD_UW", "Discriminant;D;N_{evts}", 1000, 0, 5);
-
-
-  // Create the instance of TEvtProb to calculate the differential cross-section
+   // Create the instance of TEvtProb to calculate the differential cross-section
   TEvtProb Xcal2;  
   hzgamma_event_type hzgamma_event;
 
@@ -234,7 +213,6 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     getZGAngles(genLevelInputs,genLevelOutputs, false);
 
     mz_precut->Fill(genLevelOutputs.mz, weight);
-    mz_precut_UW->Fill(genLevelOutputs.mz);
     
     //----------------------------------------------------
     //Making cuts from H->ZG Analysis Group
@@ -300,18 +278,6 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     mzg->Fill(genLevelOutputs.mzg, weight);
     mz->Fill(genLevelOutputs.mz, weight);
 
-    CosT_lp_UW->Fill(genLevelOutputs.costheta_lp);
-    CosT_lm_UW->Fill(genLevelOutputs.costheta_lm);
-    Phi_lp_UW->Fill(genLevelOutputs.phi);
-    CosTZG_UW->Fill(genLevelOutputs.cosTheta);
-    Pt_g_UW->Fill(genLevelOutputs.ptg);
-    Pt_lp_UW->Fill(genLevelOutputs.ptl1);
-    Pt_lm_UW->Fill(genLevelOutputs.ptl2);
-    eta_g_UW->Fill(genLevelOutputs.etag);
-    eta_lp_UW->Fill(genLevelOutputs.etal1);
-    eta_lm_UW->Fill(genLevelOutputs.etal2);
-    mzg_UW->Fill(genLevelOutputs.mzg);
-    mz_UW->Fill(genLevelOutputs.mz);
     //----------------------------------------------------------------------
     //     Setting Up hzgamma_event for MCFM Matrix Element Calculation
     //----------------------------------------------------------------------
@@ -369,16 +335,10 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     Ps->Fill(dXsec_HZGam_MCFM, weight);
     logPs->Fill(-log10(dXsec_HZGam_MCFM),weight);
 
-    Pb_UW->Fill(dXsec_ZGam_MCFM);
-    logPb_UW->Fill(-log10(dXsec_ZGam_MCFM));
-    Ps_UW->Fill(dXsec_HZGam_MCFM);
-    logPs_UW->Fill(-log10(dXsec_HZGam_MCFM));
-
     logBkg = -log10(dXsec_ZGam_MCFM);
     logSig = -log10(dXsec_HZGam_MCFM);
     Discriminant = -log(dXsec_ZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
     WD->Fill(Discriminant, weight);
-    WD_UW->Fill(Discriminant);
 
     KKTxt << Discriminant;
     if (Signal)

@@ -67,7 +67,6 @@ double TEvtProb::XsecCalc(TVar::Process proc, TVar::Production production, const
     mcfm_event.p[2].SetPxPyPzE   (hzgamma_event.p[0].Px(), hzgamma_event.p[0].Py(), hzgamma_event.p[0].Pz(), hzgamma_event.p[0].Energy());
     mcfm_event.p[3].SetPxPyPzE   (hzgamma_event.p[1].Px(), hzgamma_event.p[1].Py(), hzgamma_event.p[1].Pz(), hzgamma_event.p[1].Energy());
     mcfm_event.p[4].SetPxPyPzE   (hzgamma_event.p[2].Px(), hzgamma_event.p[2].Py(), hzgamma_event.p[2].Pz(), hzgamma_event.p[2].Energy());
-    //mcfm_event.p[5].SetPxPyPzE   (hzgamma_event.p[3].Px(), hzgamma_event.p[3].Py(), hzgamma_event.p[3].Pz(), hzgamma_event.p[3].Energy());
 
     if (production == TVar::QQB){
       mcfm_event.PdgCode[0] = 2;
@@ -84,8 +83,6 @@ double TEvtProb::XsecCalc(TVar::Process proc, TVar::Production production, const
     mcfm_event.PdgCode[2] = hzgamma_event.PdgCode[0];
     mcfm_event.PdgCode[3] = hzgamma_event.PdgCode[1];
     mcfm_event.PdgCode[4] = hzgamma_event.PdgCode[2];
-    //mcfm_event.PdgCode[5] = hzgamma_event.PdgCode[3];
-
     /*
     //for ( int i = 0; i < 6; i++ ) {
     for (int i = 0; i < 5; i++) {  
