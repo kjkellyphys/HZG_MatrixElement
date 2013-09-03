@@ -54,3 +54,17 @@ HiggsZGAnalyzer/BatchHistos/*
 HiggsZGAnalyzer/outputBatch/*
 HiggsZGAnalyzer/LocalHistos/*
 HiggsZGAnalyzer/pollack
+
+# Text Files #
+##############
+*.txt
+
+# Kevin's Toys #
+################
+OptimizeD*
+a.out*
+basic.C*
+
+# Backups #
+###########
+*~
