@@ -84,45 +84,14 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 
   //Weight from MCFM-Produced Files
   float weight = 0.;
-  //ch->SetBranchAddress("wt", &weight);
   weight = 1.0; //For uniform weight.
   
-  //For Reading in components of TLorentzVectors individually.
-  /*
-  float l_minus_px(0.), l_minus_py(0.), l_minus_pz(0.), l_minus_e(0.);
-  float l_plus_px(0.), l_plus_py(0.), l_plus_pz(0.), l_plus_e(0.);
-  float gamma_px(0.), gamma_py(0.), gamma_pz(0.), gamma_e(0.);
-
-  ch->SetBranchAddress("px3", &l_minus_px);
-  ch->SetBranchAddress("py3", &l_minus_py);
-  ch->SetBranchAddress("pz3", &l_minus_pz);
-  ch->SetBranchAddress("E3", &l_minus_e);
-  ch->SetBranchAddress("px4", &l_plus_px);
-  ch->SetBranchAddress("py4", &l_plus_py);
-  ch->SetBranchAddress("pz4", &l_plus_pz);
-  ch->SetBranchAddress("E4", &l_plus_e);
-  ch->SetBranchAddress("px5", &gamma_px);
-  ch->SetBranchAddress("py5", &gamma_py);
-  ch->SetBranchAddress("pz5", &gamma_pz);
-  ch->SetBranchAddress("E5", &gamma_e);
-  */
   TClonesArray *Event = new TClonesArray("TRootLHEFEvent");
   TClonesArray *Particle = new TClonesArray("TRootLHEFParticle"); 
   std::vector<TRootLHEFParticle*> PartCollec(10);
 
   ch->SetBranchAddress("Event", &Event);
   ch->SetBranchAddress("Particle", &Particle);
-
-  //For Reading in TLorentzVectors as a whole
-  /*
-  TBranch *b_l_minus; TBranch *b_l_plus; TBranch *b_gamma;
-  TLorentzVector *l_minus_event, *l_plus_event, *gamma_event;
-  l_minus_event = 0; l_plus_event = 0; gamma_event = 0;
-
-  ch->SetBranchAddress("l_minus", &l_minus_event, &b_l_minus);
-  ch->SetBranchAddress("l_plus", &l_plus_event, &b_l_plus);
-  ch->SetBranchAddress("gamma", &gamma_event, &b_gamma);
-  */
 
   //------------------------
   //      Output Files
@@ -132,8 +101,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   float dXsec_ZGam_MCFM = 0.;
   float dXsec_HZGam_MCFM = 0.;
   float Discriminant = 0.;
-  float PreBoostMass = 0.;
-  float PostBoostMass = 0.;
+  float Discriminant2 = 0.;
   float logBkg(0.), logSig(0.);
   
   evt_tree->Branch("dxSec_ZGam_MCFM"   , &dXsec_ZGam_MCFM ,"dXsec_ZGam_MCFM/F");
@@ -141,8 +109,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   evt_tree->Branch("logBkg", &logBkg, "logBkg/F");
   evt_tree->Branch("logSig", &logSig, "logSig/F");
   evt_tree->Branch("Discriminant", &Discriminant, "Discriminant/F");
-  evt_tree->Branch("PreBoostMass", &PreBoostMass, "PreBoostMass/F");
-  evt_tree->Branch("PostBoostMass", &PostBoostMass, "PostBoostMass/F");
+  evt_tree->Branch("Discriminant2", &Discriminant2, "Discriminant2/F");
   
   //User-defined Histograms (_AnglePlots.root file)
   histfile->cd();
@@ -191,8 +158,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     dXsec_ZGam_MCFM = 0.;
     dXsec_HZGam_MCFM = 0.;
     Discriminant = 0;
-    PreBoostMass = 0;
-    PostBoostMass = 0;
+    Discriminant2 = 0;
     PartCollec.clear();
     TRootLHEFEvent *EvtAccess;
 
@@ -320,7 +286,6 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 
     //Boost TLorentzVectors to ZG-Restframe for MCFM
     psum = p0 + p1 + p2;
-    PreBoostMass = psum.M();
     bv = -psum.BoostVector();
     p0.Boost(bv);
     p1.Boost(bv);
@@ -341,7 +306,6 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     float zmass = (hzgamma_event.p[0]+hzgamma_event.p[1]).M();
     float gammass = (hzgamma_event.p[2]).M();
     float zgammass = (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).M();    
-    PostBoostMass = zgammass;
 
     if (verbosity >= TVar::DEBUG) {
       cout << "\n=========================================================\n";
@@ -374,6 +338,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     logBkg = -log10(dXsec_ZGam_MCFM);
     logSig = -log10(dXsec_HZGam_MCFM);
     Discriminant = -log(dXsec_ZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
+    std::cout << "Discriminant 1: " << Discriminant << endl;
+    Discriminant2 = -log(dXsec_HZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
+    std::cout << "Discriminant 2: " << Discriminant2 << endl;
     WD->Fill(Discriminant, weight);
 
     KKTxt << Discriminant;

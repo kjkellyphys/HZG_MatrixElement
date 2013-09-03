@@ -37,6 +37,8 @@ class simple_v2 : public TSelector {
     TFile* newfile;
     TTree* ch;
     HistManager* hm;
+    TFile* KKfile;
+    TTree* evt_tree;
     
     float unskimmedEvents;
     float unskimmedEventsTotal;

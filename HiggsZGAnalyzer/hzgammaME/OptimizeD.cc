@@ -31,7 +31,7 @@ int main()
 
   MaxSB = 0.; MaxSB_cut = 0.;
 
-  for (double DiscCut = 0.; DiscCut < 0.25; DiscCut += 0.001){
+  for (double DiscCut = 0.; DiscCut < 1.0; DiscCut += 0.001){
     N_s = 0;
     N_b = 0;
     S = 0; B = 0;
@@ -43,13 +43,11 @@ int main()
 	N_b++;
     }
 
-    //Acc_s = (double)N_s / 100000;
-    //Acc_b = (double)N_b / 100000;
+    Acc_s = (double)N_s / 100000;
+    Acc_b = (double)N_b / 100000;
 
-    //S = 0.0007091 * Acc_s;
-    //B = 22.89 * Acc_b;
-    S = N_s;
-    B = N_b;
+    S = 0.0007091 * Acc_s;
+    B = 22.89 * Acc_b;
 
     CutOutput << DiscCut << " " << N_s << " " << N_b << " " << (double)S/B << " " << sqrt(1/((double)S+B)) << " " << sqrt((double)(S+B)/S) << endl;
 

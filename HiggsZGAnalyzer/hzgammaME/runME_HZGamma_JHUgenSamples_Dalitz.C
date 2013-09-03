@@ -54,11 +54,8 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   TFile* fin = new TFile(inputDir+fileName);
 
   ofstream KKTxt;
-  bool Signal = false;
-  KKTxt.open ("Discriminant.txt");
-
-  ofstream CutTxt;
-  CutTxt.open("CutFile.txt");
+  bool Signal = true;
+  KKTxt.open ("Disc_Sig.txt");
 
   //Output file 1: Matrix Element Calculations (Stored in Branches)
   TString outFileName = outputDir+fileName;
@@ -101,7 +98,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   float dXsec_ZGam_MCFM = 0.;
   float dXsec_HZGam_MCFM = 0.;
   float Discriminant = 0.;
-  //  float Discriminant2 = 0.;
+  float Discriminant2 = 0.;
+  float PreBoostMass = 0.;
+  float PostBoostMass = 0.;
   float logBkg(0.), logSig(0.);
   
   evt_tree->Branch("dxSec_ZGam_MCFM"   , &dXsec_ZGam_MCFM ,"dXsec_ZGam_MCFM/F");
@@ -109,7 +108,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   evt_tree->Branch("logBkg", &logBkg, "logBkg/F");
   evt_tree->Branch("logSig", &logSig, "logSig/F");
   evt_tree->Branch("Discriminant", &Discriminant, "Discriminant/F");
-  // evt_tree->Branch("Discriminant2", &Discriminant2, "Discriminant2/F");
+  evt_tree->Branch("Discriminant2", &Discriminant2, "Discriminant2/F");  
+  evt_tree->Branch("PreBoostMass", &PreBoostMass, "PreBoostMass/F");
+  evt_tree->Branch("PostBoostMass", &PostBoostMass, "PostBoostMass/F");
   
   //User-defined Histograms (_AnglePlots.root file)
   histfile->cd();
@@ -123,9 +124,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   TH1F* eta_g = new TH1F("eta_g", "Eta of Photon", 50, -5.0, 5.0);
   TH1F* eta_lp = new TH1F("eta_lp", "Eta of positive lepton;#eta;N_{evts}", 50, -5.0, 5.0);
   TH1F* eta_lm = new TH1F("eta_lm", "Eta of negative lepton;#eta;N_{evts}", 50, -5.0, 5.0);
-  TH1F* mzg = new TH1F("mzg", "Mass of Z-Gamma System;Mass;N_{evts}", 100, 90, 150);
-  TH1F* mz = new TH1F("mz", "Mass of Z Boson;Mass;N_{evts}", 100, 0, 150);
-  TH1F* mz_precut = new TH1F("mz_precut", "Mass of Z Boson (before cut);N_{evts}", 100, 0, 150);
+  TH1F* mllg = new TH1F("mllg", "Mass of ll-Gamma System;Mass;N_{evts}", 100, 90, 150);
+  TH1F* mll = new TH1F("mll", "Mass of Lepton Pair;Mass;N_{evts}", 100, 0, 150);
+  TH1F* mll_precut = new TH1F("mll_precut", "Mass of Lepton Pair (before cut);N_{evts}", 100, 0, 150);
   TH1F* Pb = new TH1F("Pb", "Background Probability (weighted);dXsec_ZGam;N_{evts}", 100, 0, .0001);
   TH1F* logPb = new TH1F("logPb", "Log of Background Probability (weighted);-logPb;N_{evts}", 110, -1.0, 10.0); 
   TH1F* Ps = new TH1F("Ps", "Signal Probability (weighted);dXsec_HZGam;N_{evts}", 100, 0, .0001);
@@ -158,7 +159,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     dXsec_ZGam_MCFM = 0.;
     dXsec_HZGam_MCFM = 0.;
     Discriminant = 0;
-    //    Discriminant2 = 0;
+    Discriminant2 = 0;
+    PreBoostMass = 0;
+    PostBoostMass = 0;
     PartCollec.clear();
     TRootLHEFEvent *EvtAccess;
 
@@ -215,55 +218,11 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     
     getZGAngles(genLevelInputs,genLevelOutputs, false);
 
-    mz_precut->Fill(genLevelOutputs.mz, weight);
+    mll_precut->Fill(genLevelOutputs.mz, weight);
+
+    if (genLevelOutputs.mz > 50.0)
+      continue;
     
-    //----------------------------------------------------
-    //Making cuts from H->ZG Analysis Group
-    //----------------------------------------------------
-    
-    if ((genLevelOutputs.ptg < 15.0) ||
-        (std::abs(genLevelOutputs.etal1) > 2.5) ||
-        (std::abs(genLevelOutputs.etal2) > 2.5) ||
-        (std::abs(genLevelOutputs.etag) > 2.5) ||
-        (genLevelOutputs.mz < 50.0) ||
-        (genLevelOutputs.mzg < 100.0) ||
-        (genLevelOutputs.mzg + genLevelOutputs.mz < 185.0) ||
-        (std::abs(p0.DeltaR(p2)) < 0.4) ||
-        (std::abs(p1.DeltaR(p2)) < 0.4) ||
-        ((genLevelOutputs.ptl1 > genLevelOutputs.ptl2) && (genLevelOutputs.ptl1 < 20.0 || genLevelOutputs.ptl2 < 10.0)) ||
-        ((genLevelOutputs.ptl2 > genLevelOutputs.ptl1) && (genLevelOutputs.ptl2 < 20.0 || genLevelOutputs.ptl1 < 10.0)))
-      {
-	if (verbosity >= TVar::DEBUG){
-	  std::cout << "Event does not pass cuts:" << endl;
-
-	  CutTxt << "Event #" << ievt << " fails: " << endl;
-
-	  if (genLevelOutputs.ptg < 15.0)
-	    CutTxt << "Event fails photon-Pt Cut: Photon Pt = " << genLevelOutputs.ptg << endl;
-	  if (std::abs(genLevelOutputs.etal1) > 2.5)
-	    CutTxt << "Event fails lepton-1 Eta Cut: Eta = " << genLevelOutputs.etal1 << endl;
-	  if (std::abs(genLevelOutputs.etal2) > 2.5)
-	    CutTxt << "Event fails lepton-2 Eta Cut: Eta = " << genLevelOutputs.etal2 << endl;
-	  if (std::abs(genLevelOutputs.etag) > 2.5)
-	    CutTxt << "Event fails Photon Eta Cut: Eta = " << genLevelOutputs.etag << endl;
-	  if (genLevelOutputs.mz < 50.0)
-	    CutTxt << "Event fails z-mass cut: mz = " << genLevelOutputs.mz << endl;
-	  if (genLevelOutputs.mzg < 100.0)
-	    CutTxt << "Event fails H-mass cut: mzg = " << genLevelOutputs.mzg << endl;
-	  if (genLevelOutputs.mzg + genLevelOutputs.mz < 185.0)
-	    CutTxt << "Event fails H+z-mass cut: mzg + mz = " << genLevelOutputs.mzg + genLevelOutputs.mz << endl;
-	  if (std::abs(p0.DeltaR(p2)) < 0.4)
-	    CutTxt << "Event fails lepton-1/gamma DR Cut: DR = " << p0.DeltaR(p2) << endl;
-	  if (std::abs(p1.DeltaR(p2)) < 0.4)
-	    CutTxt << "Event fails lepton-2/gamma DR Cut: DR = " << p1.DeltaR(p2) << endl;
-	  if ((genLevelOutputs.ptl1 > genLevelOutputs.ptl2) && (genLevelOutputs.ptl1 < 20.0 || genLevelOutputs.ptl2 < 10.0))
-	    CutTxt << "Event fails Lepton-Pt Cut: Pt1 = " << genLevelOutputs.ptl1 << " Pt2 = " << genLevelOutputs.ptl2 << endl;
-	  if ((genLevelOutputs.ptl2 > genLevelOutputs.ptl1) && (genLevelOutputs.ptl2 < 20.0 || genLevelOutputs.ptl1 < 10.0))
-	    CutTxt << "Event fails Lepton-Pt Cut: Pt1 = " << genLevelOutputs.ptl1 << " Pt2 = " << genLevelOutputs.ptl2 << endl;
-	}
-	continue;
-      }
-
     //-------------------------------------------------
     //        Filling User-Defined Histograms
     //-------------------------------------------------
@@ -277,8 +236,8 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     eta_g->Fill(genLevelOutputs.etag, weight);
     eta_lp->Fill(genLevelOutputs.etal1, weight);
     eta_lm->Fill(genLevelOutputs.etal2, weight);
-    mzg->Fill(genLevelOutputs.mzg, weight);
-    mz->Fill(genLevelOutputs.mz, weight);
+    mllg->Fill(genLevelOutputs.mzg, weight);
+    mll->Fill(genLevelOutputs.mz, weight);
 
     //----------------------------------------------------------------------
     //     Setting Up hzgamma_event for MCFM Matrix Element Calculation
@@ -286,6 +245,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 
     //Boost TLorentzVectors to ZG-Restframe for MCFM
     psum = p0 + p1 + p2;
+    PreBoostMass = psum.M();
     bv = -psum.BoostVector();
     p0.Boost(bv);
     p1.Boost(bv);
@@ -303,9 +263,10 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     hzgamma_event.PdgCode[1] = PDGID_1;
     hzgamma_event.PdgCode[2] = 22;
     
-    float zmass = (hzgamma_event.p[0]+hzgamma_event.p[1]).M();
+    float llmass = (hzgamma_event.p[0]+hzgamma_event.p[1]).M();
     float gammass = (hzgamma_event.p[2]).M();
-    float zgammass = (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).M();    
+    float llgammass = (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).M();    
+    PostBoostMass = llgammass;
 
     if (verbosity >= TVar::DEBUG) {
       cout << "\n=========================================================\n";
@@ -319,14 +280,14 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
 		<< (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).Py() << ", "
 		<< (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).Pz() << ", "
 		<< (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).Energy()  << ", "
-		<< zgammass << ")\n";
-      std::cout << "Z mass = " << zmass << "\tgammass = " << gammass << "\n";
+		<< llgammass << ")\n";
+      std::cout << "Z mass = " << llmass << "\tgammass = " << gammass << "\n";
       cout << "=========================================================\n";
     } 
     // finish loading event information
     
     // ==== Begin the differential cross-section calculation ====
-    Xcal2.SetHiggsMass(zgammass);
+    Xcal2.SetHiggsMass(llgammass);
     Xcal2.SetMatrixElement(TVar::MCFM);
     dXsec_ZGam_MCFM = Xcal2.XsecCalc(TVar::qqb_zgam, TVar::QQB, hzgamma_event,verbose);
     dXsec_HZGam_MCFM = Xcal2.XsecCalc(TVar::gg_hzgam, TVar::GG, hzgamma_event,verbose);
@@ -338,9 +299,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     logBkg = -log10(dXsec_ZGam_MCFM);
     logSig = -log10(dXsec_HZGam_MCFM);
     Discriminant = -log(dXsec_ZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
-    std::cout << "Discriminant 1: " << Discriminant << endl;
-    //    Discriminant2 = -log(dXsec_HZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
-    //        std::cout << "Discriminant 2: " << Discriminant2 << endl;
+    Discriminant2 = -log(dXsec_HZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
     WD->Fill(Discriminant, weight);
 
     KKTxt << Discriminant;
@@ -362,5 +321,4 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   histfile->Write();
   histfile->Close();
   KKTxt.close();
-  CutTxt.close();
 }  

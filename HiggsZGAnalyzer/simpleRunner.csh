@@ -30,7 +30,9 @@ cat > run.C << +EOF
 
      gROOT->LoadMacro("plugins/HistManager.cc+");
      gROOT->LoadMacro("plugins/ZGAngles.cc+");
-
+     gSystem->Load("libgfortran.so");
+     gSystem->Load("./hzgammaME/libmcfm_6p6.so");
+     gSystem->Load("./hzgammaME/libME.so");
 
 	  TChain* fChain = new TChain("ntupleProducer/eventTree");
 

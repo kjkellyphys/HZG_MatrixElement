@@ -84,7 +84,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   ch->SetBranchAddress("wt", &weight);
   
   //For Reading in components of TLorentzVectors individually.
- 
+  /*
   float l_minus_px(0.), l_minus_py(0.), l_minus_pz(0.), l_minus_e(0.);
   float l_plus_px(0.), l_plus_py(0.), l_plus_pz(0.), l_plus_e(0.);
   float gamma_px(0.), gamma_py(0.), gamma_pz(0.), gamma_e(0.);
@@ -101,9 +101,9 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   ch->SetBranchAddress("py5", &gamma_py);
   ch->SetBranchAddress("pz5", &gamma_pz);
   ch->SetBranchAddress("E5", &gamma_e);
-  
+  */
   //For Reading in TLorentzVectors as a whole
-  /*
+  
   TBranch *b_l_minus; TBranch *b_l_plus; TBranch *b_gamma;
   TLorentzVector *l_minus_event, *l_plus_event, *gamma_event;
   l_minus_event = 0; l_plus_event = 0; gamma_event = 0;
@@ -111,7 +111,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   ch->SetBranchAddress("l_minus", &l_minus_event, &b_l_minus);
   ch->SetBranchAddress("l_plus", &l_plus_event, &b_l_plus);
   ch->SetBranchAddress("gamma", &gamma_event, &b_gamma);
-  */
+  
 
   //------------------------
   //      Output Files
@@ -189,14 +189,14 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     TVector3 bv;
 
     //When Pulled from Components
-    p0.SetPxPyPzE(l_minus_px, l_minus_py, l_minus_pz, l_minus_e);
-    p1.SetPxPyPzE(l_plus_px, l_plus_py, l_plus_pz, l_plus_e);
-    p2.SetPxPyPzE(gamma_px, gamma_py, gamma_pz, gamma_e);
+    //p0.SetPxPyPzE(l_minus_px, l_minus_py, l_minus_pz, l_minus_e);
+    //p1.SetPxPyPzE(l_plus_px, l_plus_py, l_plus_pz, l_plus_e);
+    //p2.SetPxPyPzE(gamma_px, gamma_py, gamma_pz, gamma_e);
 
     //When Pulled from TLorentzVector
-    //p0.SetPxPyPzE(l_minus_event->Px(), l_minus_event->Py(), l_minus_event->Pz(), l_minus_event->Energy());
-    //p1.SetPxPyPzE(l_plus_event->Px(), l_plus_event->Py(), l_plus_event->Pz(), l_plus_event->Energy());
-    //p2.SetPxPyPzE(gamma_event->Px(), gamma_event->Py(), gamma_event->Pz(), gamma_event->Energy());
+    p0.SetPxPyPzE(l_minus_event->Px(), l_minus_event->Py(), l_minus_event->Pz(), l_minus_event->Energy());
+    p1.SetPxPyPzE(l_plus_event->Px(), l_plus_event->Py(), l_plus_event->Pz(), l_plus_event->Energy());
+    p2.SetPxPyPzE(gamma_event->Px(), gamma_event->Py(), gamma_event->Pz(), gamma_event->Energy());
     
     //--------------------
     //Calculating ZGAngles

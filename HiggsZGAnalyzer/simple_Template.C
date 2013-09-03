@@ -26,6 +26,8 @@
 #include "simple_v2.h"
 #include <TH2.h>
 #include <TStyle.h>
+#include "./hzgammaME/TVar.hh"
+#include "./hzgammaME/TEvtProb.cc"
 
 string  selection      = "eeGamma";
 string  period         = "2012";
@@ -33,6 +35,14 @@ string  abcd           = "ABCD";
 string  suffix         = "SUFFIX";
 bool verbose           = false;
 int quickCount         = 0;
+TEvtProb Xcal2;
+hzgamma_event_type hzgamma_event;
+
+float dXsec_ZGam_MCFM = 0.;
+float dXsec_HZGam_MCFM = 0.;
+float Discriminant = 0.;
+float PreBoostMass = 0.;
+float logBkg(0.), logSig(0.);
 
 bool MuonSortCondition(const TCMuon& m1, const TCMuon& m2) {return (m1.Pt() > m2.Pt());}
 
@@ -60,6 +70,17 @@ void simple_v2::Begin(TTree * /*tree*/)
   ch->Branch("l_minus", "TLorentzVector", &p_lminus);
   ch->Branch("l_plus", "TLorentzVector", &p_lplus);
   ch->Branch("gamma", "TLorentzVector", &p_gamma);
+
+  KKfile = new TFile("MatrixElement_Output_SUFFIX.root", "RECREATE");
+  KKfile->cd();
+  evt_tree = new TTree("K", "Events");
+
+  evt_tree->Branch("dxSec_ZGam_MCFM"   , &dXsec_ZGam_MCFM ,"dXsec_ZGam_MCFM/F");
+  evt_tree->Branch("dxSec_HZGam_MCFM"   , &dXsec_HZGam_MCFM ,"dXsec_HZGam_MCFM/F");
+  evt_tree->Branch("logBkg", &logBkg, "logBkg/F");
+  evt_tree->Branch("logSig", &logSig, "logSig/F");
+  evt_tree->Branch("Discriminant", &Discriminant, "Discriminant/F");
+  evt_tree->Branch("PreBoostMass", &PreBoostMass, "PreBoostMass/F");
 }
 
 void simple_v2::SlaveBegin(TTree * /*tree*/)
@@ -101,6 +122,16 @@ Bool_t simple_v2::Process(Long64_t entry)
   vector<TCGenParticle> vetoPhotons;
   CleanUpGen(genHZG);
   genHZG = {};
+
+  //Initialize cross-section/output variables:
+  dXsec_ZGam_MCFM = 0.;
+  dXsec_HZGam_MCFM = 0.;
+  Discriminant = 0;
+  PreBoostMass = 0;
+
+  TLorentzVector psum, p0, p1, p2;
+  TVector3 bv;
+
   if(!isRealData){
     ///////// load all the relevent particles into a struct /////////
     FindGenParticles(genParticles, selection, vetoPhotons, genHZG);
@@ -132,17 +163,16 @@ Bool_t simple_v2::Process(Long64_t entry)
         genHZG.g->Print();
       }
 
-
       if (fabs(genLevelInputs.veczg.M()-125.0)>2.0){
         cout<<"odd mass"<<endl;
         cout<<"higgsMass: "<<genLevelInputs.veczg.M()<<endl;
         cout<<"zMass (ll): "<<genLevelInputs.vecz.M()<<endl;
         cout<<"zMass (ll): "<<genLevelInputs.vecz.M()<<endl;
         cout<<endl;
-        return kTRUE;
+        //return kTRUE;
       }
       getZGAngles(genLevelInputs,genLevelOutputs, false);
-      AnglePlots(genLevelOutputs,1);
+
       quickCount += 1;
 
       p_lminus->SetPxPyPzE(genHZG.lm->Px(), genHZG.lm->Py(), genHZG.lm->Pz(), genHZG.lm->Energy());
@@ -150,7 +180,78 @@ Bool_t simple_v2::Process(Long64_t entry)
       p_gamma->SetPxPyPzE(genHZG.g->Px(), genHZG.g->Py(), genHZG.g->Pz(), genHZG.g->Energy());
       ch->Fill();
 
-      //cout<<"costheta_lm: "<<genLevelOutputs.costheta_lm<<"\tcostheta_lp: "<<genLevelOutputs.costheta_lp<<"\tphi: "<<genLevelOutputs.phi<<"\tcosTheta: "<<genLevelOutputs.cosTheta<<"\tcosThetaG: "<<genLevelOutputs.cosThetaG<<endl;
+      p0 = *p_lminus; p1 = *p_lplus; p2 = *p_gamma;
+
+      //----------------------------------------------------                                                                                                                                          
+      //Making cuts from H->ZG Analysis Group                                                                                                                                                         
+      //----------------------------------------------------                                                                                                                                         
+
+      if ((genLevelOutputs.ptg < 15.0) ||
+	  (std::abs(genLevelOutputs.etal1) > 2.5) ||
+	  (std::abs(genLevelOutputs.etal2) > 2.5) ||
+	  (std::abs(genLevelOutputs.etag) > 2.5) ||
+	  (genLevelOutputs.mz < 50.0) ||
+	  (genLevelOutputs.mzg < 100.0) ||
+	  (genLevelOutputs.mzg + genLevelOutputs.mz < 185.0) ||
+	  (std::abs(p0.DeltaR(p2)) < 0.4) ||
+	  (std::abs(p1.DeltaR(p2)) < 0.4) ||
+	  ((genLevelOutputs.ptl1 > genLevelOutputs.ptl2) && (genLevelOutputs.ptl1 < 20.0 || genLevelOutputs.ptl2 < 10.0)) ||
+	  ((genLevelOutputs.ptl2 > genLevelOutputs.ptl1) && (genLevelOutputs.ptl2 < 20.0 || genLevelOutputs.ptl1 < 10.0)))
+	return kTRUE;
+
+      AnglePlots(genLevelOutputs,1);
+
+      PreBoostMass = genLevelOutputs.mzg;
+      psum = p0 + p1 + p2;
+      bv = -psum.BoostVector();
+      p0.Boost(bv); p1.Boost(bv); p2.Boost(bv);
+
+      hzgamma_event.p[0].SetPxPyPzE(p0.Px(), p0.Py(), p0.Pz(), p0.Energy());
+      hzgamma_event.p[1].SetPxPyPzE(p1.Px(), p1.Py(), p1.Pz(), p1.Energy());
+      hzgamma_event.p[2].SetPxPyPzE(p2.Px(), p2.Py(), p2.Pz(), p2.Energy());
+
+      hzgamma_event.PdgCode[0] = 11;
+      hzgamma_event.PdgCode[1] = -11;
+      hzgamma_event.PdgCode[2] = 22;
+
+      float zmass = (hzgamma_event.p[0]+hzgamma_event.p[1]).M();
+      float gammass = (hzgamma_event.p[2]).M();
+      float zgammass = (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).M();
+
+      if (verbose) {
+	cout << "\n=========================================================\n";
+	cout << "Entry: " << entry << "\n";
+	cout << "Input: ==================================================" <<endl;
+	printf("lep1 (Px, Py, Pz, E) = (%4.4f, %4.4f, %4.4f, %4.4f)\n",  p0.Px(), p0.Py(), p0.Pz(), p0.E());
+	printf("lep2 (Px, Py, Pz, E) = (%4.4f, %4.4f, %4.4f, %4.4f)\n",  p1.Px(), p1.Py(), p1.Pz(), p1.E());
+	printf("gam (Px, Py, Pz, E) = (%4.4f, %4.4f, %4.4f, %4.4f)\n",  p2.Px(), p2.Py(), p2.Pz(), p2.E());
+	std::cout << "ZGam system (pX, pY, pZ, E, mass) = ( "
+		  << (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).Px() << ", "
+		  << (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).Py() << ", "
+		  << (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).Pz() << ", "
+		  << (hzgamma_event.p[0]+hzgamma_event.p[1]+hzgamma_event.p[2]).Energy()  << ", "
+		  << zgammass << ")\n";
+	std::cout << "Z mass = " << zmass << "\tgammass = " << gammass << "\n";
+	cout << "=========================================================\n";
+      }
+
+      // ==== Begin the differential cross-section calculation ====                                                                                                                                          
+      Xcal2.SetHiggsMass(zgammass);
+      Xcal2.SetMatrixElement(TVar::MCFM);
+      dXsec_ZGam_MCFM = Xcal2.XsecCalc(TVar::qqb_zgam, TVar::QQB, hzgamma_event,verbose);
+      dXsec_HZGam_MCFM = Xcal2.XsecCalc(TVar::gg_hzgam, TVar::GG, hzgamma_event,verbose);
+
+      hm->fill1DHist(dXsec_ZGam_MCFM, "Pb", "Background Probability", 1000, 0., .01, 1.);
+      hm->fill1DHist(dXsec_HZGam_MCFM, "Ps", "Signal Probability", 1000, 0., .01, 1.);
+      hm->fill1DHist(-log10(dXsec_ZGam_MCFM), "logPb", "-logPb", 100, 0., 12., 1.);
+      hm->fill1DHist(-log10(dXsec_HZGam_MCFM), "logPs", "-logPs", 100, 0., 12., 1.);
+      hm->fill1DHist(-log(dXsec_ZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM)), "WD", "Weighted Disccriminant", 1000, 0., 1., 1.);
+      
+      logBkg = -log10(dXsec_ZGam_MCFM);
+      logSig = -log10(dXsec_HZGam_MCFM);
+      Discriminant = -log(dXsec_ZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
+
+      evt_tree->Fill();
     }
   }
   return kTRUE;
@@ -176,6 +277,8 @@ void simple_v2::Terminate()
   histoFile->Close();  
   newfile->Write();
   newfile->Close();
+  KKfile->Write();
+  KKfile->Close();
 }
 
 bool simple_v2::PassMuonID(TCMuon *mu, muIDCuts cutLevel){
@@ -225,14 +328,18 @@ bool simple_v2::PassMuonIso(TCMuon *mu, muIsoCuts cutLevel){
 
 void simple_v2::AnglePlots(ZGAngles &zga,float eventWeight)
 {
-  hm->fill1DHist(zga.costheta_lp,"h1_costhetaLP_SUFFIX", "Cos(#theta) positive lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1, eventWeight);     
-  hm->fill1DHist(zga.costheta_lm,"h1_costhetaLM_SUFFIX", "Cos(#theta) negative lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1, eventWeight);     
-  hm->fill1DHist(zga.phi,"h1_phi_SUFFIX", "#phi positive lepton;#phi;N_{evts}", 50, -3.2, 3.2, eventWeight);     
-  hm->fill1DHist(zga.cosTheta,"h1_costhetaZG_SUFFIX", "Cos(#Theta) ZG system;cos(#Theta);N_{evts}", 50, -1.1, 1.1, eventWeight);     
-  hm->fill1DHist(zga.ptg,"h1_ptgamma_SUFFIX", "Pt of photon in ZG System;Pt;N_{evts}",50,0,200,eventWeight);
-  hm->fill1DHist(zga.etal1,"h1_etaLP_SUFFIX", "Eta of positive lepton;#eta;N_{evts}",50,-5.0,5.0,eventWeight);
-  hm->fill1DHist(zga.etal2,"h1_etaLM_SUFFIX", "Eta of negative lepton;#eta;N_{evts}",50,-5.0,5.0,eventWeight);
-  hm->fill1DHist(zga.etag,"h1_etagamma_SUFFIX", "Eta of Gamma;#eta;N_{evts}",50,-5.0,5.0,eventWeight);
+  hm->fill1DHist(zga.costheta_lp,"CosT_lp", "Cos(#theta) positive lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1, eventWeight);     
+  hm->fill1DHist(zga.costheta_lm,"CosT_lm", "Cos(#theta) negative lepton;cos(#theta);N_{evts}", 50, -1.1, 1.1, eventWeight);     
+  hm->fill1DHist(zga.phi,"Phi_lp", "#phi positive lepton;#phi;N_{evts}", 50, -3.2, 3.2, eventWeight);     
+  hm->fill1DHist(zga.cosTheta,"CosTZG", "Cos(#Theta) ZG system;cos(#Theta);N_{evts}", 50, -1.1, 1.1, eventWeight);     
+  hm->fill1DHist(zga.ptg,"Pt_g", "Pt of photon in ZG System;Pt;N_{evts}",50,0,200,eventWeight);
+  hm->fill1DHist(zga.ptl1, "Pt_lp", "Pt of positive lepton;Pt;N_{evts}",50,0.,200.,eventWeight);
+  hm->fill1DHist(zga.ptl2, "Pt_lm", "Pt of negative lepton;Pt;N_{evts}",50,0.,200.,eventWeight);
+  hm->fill1DHist(zga.etal1,"eta_lp", "Eta of positive lepton;#eta;N_{evts}",50,-5.0,5.0,eventWeight);
+  hm->fill1DHist(zga.etal2,"eta_lm", "Eta of negative lepton;#eta;N_{evts}",50,-5.0,5.0,eventWeight);
+  hm->fill1DHist(zga.etag,"eta_g", "Eta of Gamma;#eta;N_{evts}",50,-5.0,5.0,eventWeight);
+  hm->fill1DHist(zga.mz, "mll", "Mass of di-Lepton Pair;Mass;N_{evts}", 200, 0., 150., eventWeight);
+  hm->fill1DHist(zga.mzg, "mllg", "Mass of ll-Gamma System;Mass;N_{evts}", 200, 105., 135., eventWeight);
 }
 
 void  simple_v2::FindGenParticles(TClonesArray *genParticles, string selection, vector<TCGenParticle>& vetoPhotons, genHZGParticles& _genHZG){
@@ -276,7 +383,6 @@ void  simple_v2::FindGenParticles(TClonesArray *genParticles, string selection, 
   else if (isEEGamma && (selection == "eeGamma")) genLeptons = genElectrons;
   
   if (_genHZG.lp){
-    cout<<"well here's your fucking problem"<<endl;
     _genHZG.lp->Print();
     cout<<endl;
   }
