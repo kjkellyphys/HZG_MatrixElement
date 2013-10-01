@@ -45,6 +45,10 @@ void My_choose(TVar::Process process){
     nproc_.nproc=120;
     chooser_();
   }
+  else if(process==TVar::qqb_zjet){
+    nproc_.nproc=41;
+    chooser_();
+  }
 
   /*
   //ZZ_4l

@@ -32,6 +32,7 @@ public:
     //HZZ_4l   =1, // 0+
     qqb_zgam   =0, // background
     gg_hzgam   =1, // Higgs to Z+Gamma
+    qqb_zjet   =2, // background with jet
     Null
   };
   enum LeptonFlavor{

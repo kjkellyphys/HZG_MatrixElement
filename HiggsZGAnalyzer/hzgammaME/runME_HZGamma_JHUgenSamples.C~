@@ -121,6 +121,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   float dXsec_ZGam_MCFM = 0.;
   float dXsec_HZGam_MCFM = 0.;
   float Discriminant = 0.;
+  float Discriminant2 = 0.;
   float PreBoostMass = 0.;
   float PostBoostMass = 0.;
   float logBkg(0.), logSig(0.);
@@ -130,6 +131,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
   evt_tree->Branch("logBkg", &logBkg, "logBkg/F");
   evt_tree->Branch("logSig", &logSig, "logSig/F");
   evt_tree->Branch("Discriminant", &Discriminant, "Discriminant/F");
+  evt_tree->Branch("Discriminant2", &Discriminant2, "Discriminant2/F");
   evt_tree->Branch("PreBoostMass", &PreBoostMass, "PreBoostMass/F");
   evt_tree->Branch("PostBoostMass", &PostBoostMass, "PostBoostMass/F");
   
@@ -180,6 +182,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     dXsec_ZGam_MCFM = 0.;
     dXsec_HZGam_MCFM = 0.;
     Discriminant = 0;
+    Discriminant2 = 0;
     PreBoostMass = 0;
     PostBoostMass = 0;
 
@@ -218,6 +221,8 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     //Making cuts from H->ZG Analysis Group
     //----------------------------------------------------
 
+
+    CutTxt << genLevelOutputs.costheta_lp << " " << genLevelOutputs.phi << " " << genLevelOutputs.cosTheta << endl;
 
     if ((genLevelOutputs.ptg < 15.0) ||
 	(std::abs(genLevelOutputs.etal1) > 2.5) ||
@@ -338,6 +343,7 @@ void xseccalc(TString inputDir, TString fileName, TString outputDir, int maxevt,
     logBkg = -log10(dXsec_ZGam_MCFM);
     logSig = -log10(dXsec_HZGam_MCFM);
     Discriminant = -log(dXsec_ZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
+    Discriminant = -log(dXsec_HZGam_MCFM/(dXsec_ZGam_MCFM+dXsec_HZGam_MCFM));
     WD->Fill(Discriminant, weight);
 
     KKTxt << Discriminant;
